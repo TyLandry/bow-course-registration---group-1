@@ -40,7 +40,7 @@ export default function Header() {
             to="/desingLibrary"
             className="px-3 py-2 text-sm rounded hover:text-[var(--system-orange)]"
           >
-            Desing Library
+            Design Library
           </Link>
         </nav>
       </div>
