@@ -1,0 +1,47 @@
+[
+  {
+    "id": "SD-DIP-2023",
+    "name": "Software Development Diploma",
+    "term": "Fall 2023",
+    "start": "September 5, 2023",
+    "end": "April 30, 2024",
+    "fees": 8500,
+    "desc": "A comprehensive program covering fundamentals of software development, including programming, database design, and web development."
+  },
+  {
+    "id": "SD-PD-2023",
+    "name": "Software Development Post-Diploma",
+    "term": "Winter 2023",
+    "start": "January 10, 2023",
+    "end": "December 15, 2023",
+    "fees": 9200,
+    "desc": "An advanced program for students with prior education in IT, focusing on specialized software development skills and industry applications."
+  },
+  {
+    "id": "WD-CERT-2023",
+    "name": "Web Development Certificate",
+    "term": "Spring 2023",
+    "start": "May 1, 2023",
+    "end": "August 30, 2023",
+    "fees": 4200,
+    "desc": "A focused program on modern web development technologies, frameworks, and best practices."
+  },
+  {
+    "id": "DS-CERT-2023",
+    "name": "Data Science Certificate",
+    "term": "Summer 2023",
+    "start": "June 1, 2023",
+    "end": "August 31, 2023",
+    "fees": 4800,
+    "desc": "An introductory program on data analysis, statistics, and machine learning using Python and R."
+  },
+  {
+    "id": "CYBER-DIP-2023",
+    "name": "Cybersecurity Diploma",
+    "term": "Fall 2023",
+    "start": "September 5, 2023",
+    "end": "March 15, 2024",
+    "fees": 8800,
+    "desc": "Comprehensive training on network security, ethical hacking, and information security management."
+  }
+]
