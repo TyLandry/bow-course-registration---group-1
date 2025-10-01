@@ -7,15 +7,17 @@ import HomePage from "./pages/HomePage";
 export default function App() {
   return (
     <Router>
-      <Header /> {/* Persistent header on all pages */}
-      <div className="px-3 py-3 md:px-[100px]">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/homePage" element={<HomePage />} />
-          <Route path="/desingLibrary" element={<DesingLibrary />} />
-        </Routes>
+      <div className="flex flex-col min-h-screen">
+        <Header /> {/* Persistent header on all pages */}
+        <div className="px-3 py-3 md:px-[100px] flex-1">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/homePage" element={<HomePage />} />
+            <Route path="/desingLibrary" element={<DesingLibrary />} />
+          </Routes>
+        </div>
+        <Footer />
       </div>
-      <Footer />
     </Router>
   );
 }
