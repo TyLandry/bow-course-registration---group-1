@@ -7,7 +7,7 @@ export default function Header() {
         <h1 className="text-xl font-bold">Bow Course Registration</h1>
         <nav className="flex gap-4">
           <Link
-            to="/homePage"
+            to="/home-page"
             className="px-3 py-2 text-sm rounded hover:text-[var(--system-orange)]"
           >
             Home
@@ -37,7 +37,7 @@ export default function Header() {
             Sign Up
           </Link>
           <Link
-            to="/desingLibrary"
+            to="/design-library"
             className="px-3 py-2 text-sm rounded hover:text-[var(--system-orange)]"
           >
             Design Library

@@ -13,8 +13,8 @@ export default function App() {
         <div className="px-3 py-3 md:px-[100px] flex-1">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/homePage" element={<HomePage />} />
-            <Route path="/desingLibrary" element={<DesingLibrary />} />
+            <Route path="/home-page" element={<HomePage />} />
+            <Route path="/design-library" element={<DesingLibrary />} />
             <Route path="/student-dashboard" element={<StudentDashboard />} />
           </Routes>
         </div>
