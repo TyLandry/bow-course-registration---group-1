@@ -42,6 +42,12 @@ export default function Header() {
           >
             Design Library
           </Link>
+          <Link
+            to="/student-dashboard"
+            className="px-3 py-2 text-sm rounded hover:text-[var(--system-orange)]"
+          >
+            Student Dashboard
+          </Link>
         </nav>
       </div>
     </header>
