@@ -3,6 +3,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import DesingLibrary from "./pages/DesignLibrary";
 import HomePage from "./pages/HomePage";
+import StudentDashboard from "./pages/StudentDashboard";
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/homePage" element={<HomePage />} />
             <Route path="/desingLibrary" element={<DesingLibrary />} />
+            <Route path="/student-dashboard" element={<StudentDashboard />} />
           </Routes>
         </div>
         <Footer />
