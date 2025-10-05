@@ -4,6 +4,8 @@ import Footer from "./components/Footer";
 import DesingLibrary from "./pages/DesignLibrary";
 import HomePage from "./pages/HomePage";
 import StudentDashboard from "./pages/StudentDashboard";
+import LoginPage from "./pages/LoginPage";
+import SignUpPage from "./pages/SignupPage";
 
 export default function App() {
   return (
@@ -16,6 +18,8 @@ export default function App() {
             <Route path="/home-page" element={<HomePage />} />
             <Route path="/design-library" element={<DesingLibrary />} />
             <Route path="/student-dashboard" element={<StudentDashboard />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignUpPage/>}></Route>
           </Routes>
         </div>
         <Footer />
