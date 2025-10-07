@@ -6,6 +6,7 @@ import HomePage from "./pages/HomePage";
 import StudentDashboard from "./pages/StudentDashboard";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignupPage";
+import AdminDashboard from "./pages/AdminDashboard";
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
             <Route path="/student-dashboard" element={<StudentDashboard />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage/>}></Route>
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
           </Routes>
         </div>
         <Footer />

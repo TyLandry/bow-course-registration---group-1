@@ -48,6 +48,9 @@ export default function Header() {
           >
             Student Dashboard
           </Link>
+          <Link to="/admin-dashboard" className="px-3 py-2 text-sm rounded hover:text-[var(--system-orange)]">
+          Admin Dashboard
+          </Link>
         </nav>
       </div>
     </header>
