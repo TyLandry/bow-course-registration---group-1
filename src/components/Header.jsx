@@ -4,7 +4,13 @@ export default function Header() {
   return (
     <header className="bg-2 text-white py-2 px-3">
       <div className="mx-auto flex justify-between items-center">
-        <h1 className="text-xl font-bold">Bow Course Registration</h1>
+        <h1 className="text-xl font-bold cursor-none">
+          <Link
+            to="/home-page"
+          >Bow Course Registration</Link>
+        </h1>
+
+        {/* Nav links */}
         <nav className="flex gap-4">
           <Link
             to="/home-page"
