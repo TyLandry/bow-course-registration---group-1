@@ -16,23 +16,83 @@ export default function StudentDashboard() {
     // Mock data for different terms, generated from chatGPT.
     const coursesByTerm = {
       'Spring 2025': [
-        { code: 'CS201', name: 'Data Structures & Algorithms', instructor: 'Dr. Ada Lovelace', term: 'Spring 2025', status: 'Completed' },
-        { code: 'CS220', name: 'Web Development Fundamentals', instructor: 'Mr. Alan Turing', term: 'Spring 2025', status: 'Completed' }
+        {
+          code: 'CS201',
+          name: 'Data Structures & Algorithms',
+          instructor: 'Dr. Ada Lovelace',
+          term: 'Spring 2025',
+          status: 'Completed',
+        },
+        {
+          code: 'CS220',
+          name: 'Web Development Fundamentals',
+          instructor: 'Mr. Alan Turing',
+          term: 'Spring 2025',
+          status: 'Completed',
+        },
       ],
       'Summer 2025': [
-        { code: 'CS230', name: 'Database Systems', instructor: 'Dr. Grace Hopper', term: 'Summer 2025', status: 'In Progress' },
-        { code: 'CS240', name: 'Mobile App Development', instructor: 'Ms. Margaret Hamilton', term: 'Summer 2025', status: 'In Progress' }
+        {
+          code: 'CS230',
+          name: 'Database Systems',
+          instructor: 'Dr. Grace Hopper',
+          term: 'Summer 2025',
+          status: 'In Progress',
+        },
+        {
+          code: 'CS240',
+          name: 'Mobile App Development',
+          instructor: 'Ms. Margaret Hamilton',
+          term: 'Summer 2025',
+          status: 'In Progress',
+        },
       ],
       'Fall 2025': [
-        { code: 'CS250', name: 'Software Engineering', instructor: 'Dr. Linus Torvalds', term: 'Fall 2025', status: 'In Progress' },
-        { code: 'CS260', name: 'Frontend Frameworks', instructor: 'Ms. Tracy Chou', term: 'Fall 2025', status: 'In Progress' },
-        { code: 'CS270', name: 'Backend Development', instructor: 'Mr. Brendan Eich', term: 'Fall 2025', status: 'In Progress' },
-        { code: 'CS280', name: 'DevOps & Cloud', instructor: 'Ms. Kelsey Hightower', term: 'Fall 2025', status: 'In Progress' }
+        {
+          code: 'CS250',
+          name: 'Software Engineering',
+          instructor: 'Dr. Linus Torvalds',
+          term: 'Fall 2025',
+          status: 'In Progress',
+        },
+        {
+          code: 'CS260',
+          name: 'Frontend Frameworks',
+          instructor: 'Ms. Tracy Chou',
+          term: 'Fall 2025',
+          status: 'In Progress',
+        },
+        {
+          code: 'CS270',
+          name: 'Backend Development',
+          instructor: 'Mr. Brendan Eich',
+          term: 'Fall 2025',
+          status: 'In Progress',
+        },
+        {
+          code: 'CS280',
+          name: 'DevOps & Cloud',
+          instructor: 'Ms. Kelsey Hightower',
+          term: 'Fall 2025',
+          status: 'In Progress',
+        },
       ],
       'Winter 2025': [
-        { code: 'CS290', name: 'Machine Learning Basics', instructor: 'Dr. Fei-Fei Li', term: 'Winter 2025', status: 'Planned' },
-        { code: 'CS295', name: 'Capstone Project', instructor: 'Dr. Tim Berners-Lee', term: 'Winter 2025', status: 'Planned' }
-      ]
+        {
+          code: 'CS290',
+          name: 'Machine Learning Basics',
+          instructor: 'Dr. Fei-Fei Li',
+          term: 'Winter 2025',
+          status: 'Planned',
+        },
+        {
+          code: 'CS295',
+          name: 'Capstone Project',
+          instructor: 'Dr. Tim Berners-Lee',
+          term: 'Winter 2025',
+          status: 'Planned',
+        },
+      ],
     };
     setEnrolledCourses(coursesByTerm[selectedTerm] || []);
   }, [selectedTerm]);
@@ -41,44 +101,76 @@ export default function StudentDashboard() {
   const handleViewDetails = (courseCode) => {
     navigate(`/course-details`, { state: { courseCode } });
   };
-// Mock notifications data
-// bell icon is copy/pasted from emojipedia.org
+  // Mock notifications data
+  // bell icon is copy/pasted from emojipedia.org
   const notifications = [
-    { icon: '🔔', title: 'Registration for Spring 2024 opens in 2 days', date: 'October 15, 2023' },
-    { icon: '🔔', title: 'New announcement in CS101', date: 'October 12, 2023' },
-    { icon: '🔔', title: 'Grade posted for MATH204 Assignment 3', date: 'October 8, 2023' }
+    {
+      icon: '🔔',
+      title: 'Registration for Spring 2024 opens in 2 days',
+      date: 'October 15, 2023',
+    },
+    {
+      icon: '🔔',
+      title: 'New announcement in CS101',
+      date: 'October 12, 2023',
+    },
+    {
+      icon: '🔔',
+      title: 'Grade posted for MATH204 Assignment 3',
+      date: 'October 8, 2023',
+    },
   ];
-// main container with vertical layout and spacing. it includes sections for welcome message, term selection, registered courses, class schedule, and notifications.*Note: Notifications needs a route to Contact page, or we can create a separate Message page.
+  // main container with vertical layout and spacing. it includes sections for welcome message, term selection, registered courses, class schedule, and notifications.*Note: Notifications needs a route to Contact page, or we can create a separate Message page.
   return (
     <div className="flex flex-col gap-10">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Welcome, {studentName}!</h1>
         <div className="w-12 h-12 bg-1 rounded-full flex items-center justify-center text-white font-bold text-xl">
-          {studentName.split(' ').map(n => n[0]).join('')}
+          {studentName
+            .split(' ')
+            .map((n) => n[0])
+            .join('')}
         </div>
       </div>
 
       <div>
         <h3 className="text-sm font-semibold mb-2">Select Term</h3>
         <div className="flex gap-3">
-          {['Spring 2025', 'Summer 2025', 'Fall 2025', 'Winter 2025'].map((term) => (
-            <button key={term} onClick={() => setSelectedTerm(term)} className={`px-4 py-2 text-sm rounded-md ${selectedTerm === term ? 'bg-1 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}>
-              {term}
-            </button>
-          ))}
+          {['Spring 2025', 'Summer 2025', 'Fall 2025', 'Winter 2025'].map(
+            (term) => (
+              <button
+                key={term}
+                onClick={() => setSelectedTerm(term)}
+                className={`px-4 py-2 text-sm rounded-md ${
+                  selectedTerm === term
+                    ? 'bg-1 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                {term}
+              </button>
+            )
+          )}
         </div>
       </div>
 
       <div>
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-xl font-bold">Your Registered Courses</h2>
-          <Link to="/course-registration" className="btn-primary-fill py-2 px-4 text-sm">Add Course</Link>
+          <Link
+            to="/course-registration"
+            className="btn-primary-fill py-2 px-4 text-sm"
+          >
+            Add Course
+          </Link>
         </div>
 
         <div className="mb-4">
           <h3 className="font-semibold mb-2">Current Courses</h3>
           {enrolledCourses.length === 0 ? (
-            <p className="text-gray-500 text-sm">No courses registered for {selectedTerm}.</p>
+            <p className="text-gray-500 text-sm">
+              No courses registered for {selectedTerm}.
+            </p>
           ) : (
             <table className="min-w-full border-[1px] border-[var(--system-purple)]">
               <thead className="bg-1 text-white">
@@ -93,16 +185,24 @@ export default function StudentDashboard() {
               </thead>
               <tbody>
                 {enrolledCourses.map((course, index) => (
-                  <tr key={index} className="text-xs border-b border-[var(--system-purple)]">
+                  <tr
+                    key={index}
+                    className="text-xs border-b border-[var(--system-purple)]"
+                  >
                     <td className="p-3 font-semibold">{course.code}</td>
                     <td className="p-3">{course.name}</td>
                     <td className="p-3">{course.instructor}</td>
                     <td className="p-3">{course.term}</td>
                     <td className="p-3">
-                      <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">{course.status}</span>
+                      <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">
+                        {course.status}
+                      </span>
                     </td>
                     <td className="p-3">
-                      <button onClick={() => handleViewDetails(course.code)} className="btn-primary-outlined text-xs">
+                      <button
+                        onClick={() => handleViewDetails(course.code)}
+                        className="btn-primary-outlined text-xs"
+                      >
                         <p className="py-1 px-3">View Details</p>
                       </button>
                     </td>
@@ -118,25 +218,36 @@ export default function StudentDashboard() {
         <div className="w-16 h-16 bg-gray-300 rounded-md"></div>
         <div>
           <h3 className="font-bold mb-1">Class Schedule</h3>
-          <p className="text-sm text-[var(--system-gray)]">View your upcoming classes in the calendar format.</p>
+          <p className="text-sm text-[var(--system-gray)]">
+            View your upcoming classes in the calendar format.
+          </p>
         </div>
       </div>
-    {/* Notifications and Messages*/}
-    <div className="max-w-2xl mx-auto w-full">
+      {/* Notifications and Messages*/}
+      <div className="max-w-2xl mx-auto w-full">
         <div className="flex items-center gap-2 mb-3">
-        <h2 className="text-lg font-bold">Notifications and Messages</h2>
-  {/* Blue circle badge showing number of notifications */}
-        <span className="bg-[var(--system-blue)] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
-         {notifications.length}
-  </span>
-</div>
+          <h2 className="text-lg font-bold">Notifications and Messages</h2>
+          {/* Blue circle badge showing number of notifications */}
+          <span className="bg-[var(--system-blue)] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
+            {notifications.length}
+          </span>
+        </div>
         <div className="border-[1px] border-[var(--system-purple)] rounded-md">
           {notifications.map((notification, index) => (
-            <div key={index} className={`flex items-start gap-3 p-4 ${index !== notifications.length - 1 ? 'border-b border-gray-200' : ''}`}>
+            <div
+              key={index}
+              className={`flex items-start gap-3 p-4 ${
+                index !== notifications.length - 1
+                  ? 'border-b border-gray-200'
+                  : ''
+              }`}
+            >
               <span className="text-xl">{notification.icon}</span>
               <div className="flex-1">
                 <p className="text-sm font-medium">{notification.title}</p>
-                <p className="text-xs text-[var(--system-gray)] mt-1">{notification.date}</p>
+                <p className="text-xs text-[var(--system-gray)] mt-1">
+                  {notification.date}
+                </p>
               </div>
             </div>
           ))}
