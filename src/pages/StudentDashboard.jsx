@@ -1,96 +1,96 @@
 //Import React and necessary hooks and components
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import coursesData from '../temp_data/courses.json';
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+// import coursesData from "../temp_data/courses.json";
 
 // This is the Student Dashboard component
 // It displays the student's name, registered courses, term selection, and notifications
 export default function StudentDashboard() {
   const navigate = useNavigate();
-  const [studentName] = useState('John Doe');
-  const [selectedTerm, setSelectedTerm] = useState('Fall 2025');
+  const [studentName] = useState("John Doe");
+  const [selectedTerm, setSelectedTerm] = useState("Fall 2025");
   const [enrolledCourses, setEnrolledCourses] = useState([]);
 
   // Simulate fetching enrolled courses for the selected term
   useEffect(() => {
     // Mock data for different terms, generated from chatGPT.
     const coursesByTerm = {
-      'Spring 2025': [
+      "Spring 2025": [
         {
-          code: 'CS201',
-          name: 'Data Structures & Algorithms',
-          instructor: 'Dr. Ada Lovelace',
-          term: 'Spring 2025',
-          status: 'Completed',
+          code: "CS201",
+          name: "Data Structures & Algorithms",
+          instructor: "Dr. Ada Lovelace",
+          term: "Spring 2025",
+          status: "Completed",
         },
         {
-          code: 'CS220',
-          name: 'Web Development Fundamentals',
-          instructor: 'Mr. Alan Turing',
-          term: 'Spring 2025',
-          status: 'Completed',
-        },
-      ],
-      'Summer 2025': [
-        {
-          code: 'CS230',
-          name: 'Database Systems',
-          instructor: 'Dr. Grace Hopper',
-          term: 'Summer 2025',
-          status: 'In Progress',
-        },
-        {
-          code: 'CS240',
-          name: 'Mobile App Development',
-          instructor: 'Ms. Margaret Hamilton',
-          term: 'Summer 2025',
-          status: 'In Progress',
+          code: "CS220",
+          name: "Web Development Fundamentals",
+          instructor: "Mr. Alan Turing",
+          term: "Spring 2025",
+          status: "Completed",
         },
       ],
-      'Fall 2025': [
+      "Summer 2025": [
         {
-          code: 'CS250',
-          name: 'Software Engineering',
-          instructor: 'Dr. Linus Torvalds',
-          term: 'Fall 2025',
-          status: 'In Progress',
+          code: "CS230",
+          name: "Database Systems",
+          instructor: "Dr. Grace Hopper",
+          term: "Summer 2025",
+          status: "In Progress",
         },
         {
-          code: 'CS260',
-          name: 'Frontend Frameworks',
-          instructor: 'Ms. Tracy Chou',
-          term: 'Fall 2025',
-          status: 'In Progress',
-        },
-        {
-          code: 'CS270',
-          name: 'Backend Development',
-          instructor: 'Mr. Brendan Eich',
-          term: 'Fall 2025',
-          status: 'In Progress',
-        },
-        {
-          code: 'CS280',
-          name: 'DevOps & Cloud',
-          instructor: 'Ms. Kelsey Hightower',
-          term: 'Fall 2025',
-          status: 'In Progress',
+          code: "CS240",
+          name: "Mobile App Development",
+          instructor: "Ms. Margaret Hamilton",
+          term: "Summer 2025",
+          status: "In Progress",
         },
       ],
-      'Winter 2025': [
+      "Fall 2025": [
         {
-          code: 'CS290',
-          name: 'Machine Learning Basics',
-          instructor: 'Dr. Fei-Fei Li',
-          term: 'Winter 2025',
-          status: 'Planned',
+          code: "CS250",
+          name: "Software Engineering",
+          instructor: "Dr. Linus Torvalds",
+          term: "Fall 2025",
+          status: "In Progress",
         },
         {
-          code: 'CS295',
-          name: 'Capstone Project',
-          instructor: 'Dr. Tim Berners-Lee',
-          term: 'Winter 2025',
-          status: 'Planned',
+          code: "CS260",
+          name: "Frontend Frameworks",
+          instructor: "Ms. Tracy Chou",
+          term: "Fall 2025",
+          status: "In Progress",
+        },
+        {
+          code: "CS270",
+          name: "Backend Development",
+          instructor: "Mr. Brendan Eich",
+          term: "Fall 2025",
+          status: "In Progress",
+        },
+        {
+          code: "CS280",
+          name: "DevOps & Cloud",
+          instructor: "Ms. Kelsey Hightower",
+          term: "Fall 2025",
+          status: "In Progress",
+        },
+      ],
+      "Winter 2025": [
+        {
+          code: "CS290",
+          name: "Machine Learning Basics",
+          instructor: "Dr. Fei-Fei Li",
+          term: "Winter 2025",
+          status: "Planned",
+        },
+        {
+          code: "CS295",
+          name: "Capstone Project",
+          instructor: "Dr. Tim Berners-Lee",
+          term: "Winter 2025",
+          status: "Planned",
         },
       ],
     };
@@ -105,19 +105,19 @@ export default function StudentDashboard() {
   // bell icon is copy/pasted from emojipedia.org
   const notifications = [
     {
-      icon: '🔔',
-      title: 'Registration for Spring 2024 opens in 2 days',
-      date: 'October 15, 2023',
+      icon: "🔔",
+      title: "Registration for Spring 2024 opens in 2 days",
+      date: "October 15, 2023",
     },
     {
-      icon: '🔔',
-      title: 'New announcement in CS101',
-      date: 'October 12, 2023',
+      icon: "🔔",
+      title: "New announcement in CS101",
+      date: "October 12, 2023",
     },
     {
-      icon: '🔔',
-      title: 'Grade posted for MATH204 Assignment 3',
-      date: 'October 8, 2023',
+      icon: "🔔",
+      title: "Grade posted for MATH204 Assignment 3",
+      date: "October 8, 2023",
     },
   ];
   // main container with vertical layout and spacing. it includes sections for welcome message, term selection, registered courses, class schedule, and notifications.*Note: Notifications needs a route to Contact page, or we can create a separate Message page.
@@ -127,24 +127,24 @@ export default function StudentDashboard() {
         <h1 className="text-2xl font-bold">Welcome, {studentName}!</h1>
         <div className="w-12 h-12 bg-1 rounded-full flex items-center justify-center text-white font-bold text-xl">
           {studentName
-            .split(' ')
+            .split(" ")
             .map((n) => n[0])
-            .join('')}
+            .join("")}
         </div>
       </div>
 
       <div>
         <h3 className="text-sm font-semibold mb-2">Select Term</h3>
         <div className="flex gap-3">
-          {['Spring 2025', 'Summer 2025', 'Fall 2025', 'Winter 2025'].map(
+          {["Spring 2025", "Summer 2025", "Fall 2025", "Winter 2025"].map(
             (term) => (
               <button
                 key={term}
                 onClick={() => setSelectedTerm(term)}
                 className={`px-4 py-2 text-sm rounded-md ${
                   selectedTerm === term
-                    ? 'bg-1 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ? "bg-1 text-white"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                 }`}
               >
                 {term}
@@ -238,8 +238,8 @@ export default function StudentDashboard() {
               key={index}
               className={`flex items-start gap-3 p-4 ${
                 index !== notifications.length - 1
-                  ? 'border-b border-gray-200'
-                  : ''
+                  ? "border-b border-gray-200"
+                  : ""
               }`}
             >
               <span className="text-xl">{notification.icon}</span>
