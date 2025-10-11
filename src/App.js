@@ -7,7 +7,7 @@ import StudentDashboard from "./pages/StudentDashboard";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignupPage";
 import AdminDashboard from "./pages/AdminDashboard";
-import StudentListPage from "./pages/StudentListPage";
+import SubmittedForms from "./pages/SubmittedForms";
 
 export default function App() {
   return (
@@ -22,8 +22,8 @@ export default function App() {
             <Route path="/student-dashboard" element={<StudentDashboard />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignUpPage />}></Route>
+            <Route path="/submitted-forms" element={<SubmittedForms />}></Route>
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
-            <Route path="/student-list" element={<StudentListPage />} />
           </Routes>
         </div>
         <Footer />
