@@ -21,8 +21,8 @@ export default function App() {
             <Route path="/design-library" element={<DesingLibrary />} />
             <Route path="/student-dashboard" element={<StudentDashboard />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignUpPage />}></Route>
-            <Route path="/submitted-forms" element={<SubmittedForms />}></Route>
+            <Route path="/signup" element={<SignUpPage />} />
+            <Route path="/submitted-forms" element={<SubmittedForms />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
           </Routes>
         </div>
