@@ -1,5 +1,20 @@
 import React, { useEffect } from "react";
-
+const [selectedMessage, setSelectedMessage] = useState(null);
+// Simulated Data for messages and students
+const mockMessages = [
+  {
+    id: 1,
+    studentName: "John Doe",
+    studentId: "12345",
+    program: "Software Development",
+    term: "Fall 2023",
+    dateSubmitted: "2025-10-05",
+    status: "New",
+    messagePreview: "Hello, I would like to inquire about...",
+    fullMessage:
+      "Hello, I would like to inquire about the course syllabus for...",
+  },
+];
 export default function SubmittedForms() {
   return (
     <div className="flex flex-col items-center gap-6 py-10">
@@ -17,12 +32,83 @@ export default function SubmittedForms() {
 
       {/* For forms list */}
       <div className="max-w-6xl mx-auto px-6 mt-28">
-        <h2 className="font-bold">Forms list</h2>
-        <p className="text-gray-600 py-3">Overview of submitted list</p>
+        <h2 className="font-bold text-xl">Forms List</h2>
+        <p className="text-gray-600 py-3">
+          Overview of submitted student messages.
+        </p>
 
-        <div className="rounded-md p-6 flex items-center gap-4 border shadow-md">
-          <div className="w-16 h-16 bg-gray-300 rounded-lg" />
-          <p className="text-gray-700">Summary content goes here…</p>
+        {/* Forms container */}
+        <div className="flex flex-col gap-4">
+          {mockMessages.map((msg) => (
+            <div
+              key={msg.id}
+              className="border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
+            >
+              {/* Top Row: Student info + ID + Term */}
+              <div className="flex flex-wrap justify-between items-center">
+                <div className="flex items-center gap-3">
+                  {/* Icon placeholder */}
+                  <div className="w-10 h-10 bg-gray-200 flex items-center justify-center rounded-full">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-6 h-6 text-gray-500"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15.75 9V5.25m0 0L12 9m3.75-3.75L19.5 9M4.5 12.75V18a2.25 2.25 0 002.25 2.25h10.5A2.25 2.25 0 0019.5 18v-5.25M4.5 12.75l7.5-7.5 7.5 7.5"
+                      />
+                    </svg>
+                  </div>
+
+                  <div>
+                    <p className="font-semibold text-blue-600 hover:underline cursor-pointer">
+                      {msg.studentName}
+                    </p>
+                    <p className="text-sm text-gray-500">{msg.program}</p>
+                  </div>
+                </div>
+
+                <div className="text-right text-sm text-gray-600">
+                  <p>
+                    Student ID:{" "}
+                    <span className="font-medium">{msg.studentId}</span>
+                  </p>
+                  <p>Term: {msg.term}</p>
+                </div>
+              </div>
+
+              {/* Middle Row: Date + Status + Message Preview */}
+              <div className="mt-4 flex flex-wrap justify-between items-center text-sm text-gray-600">
+                <p>Date Submitted: {msg.dateSubmitted}</p>
+                <p>
+                  Status:{" "}
+                  <span className="font-medium text-green-600">
+                    {msg.status}
+                  </span>
+                </p>
+              </div>
+
+              {/* Message Preview */}
+              <div className="mt-3 text-gray-700 text-sm">
+                <p>
+                  <span className="font-medium">Message Preview:</span>{" "}
+                  {msg.messagePreview}
+                </p>
+              </div>
+
+              {/* Bottom Link */}
+              <div className="mt-4 text-right">
+                <button className="text-blue-600 font-medium hover:underline">
+                  View Full Message →
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* For message details space */}
