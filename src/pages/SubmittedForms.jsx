@@ -1,21 +1,22 @@
-import React, { useEffect } from "react";
-const [selectedMessage, setSelectedMessage] = useState(null);
-// Simulated Data for messages and students
-const mockMessages = [
-  {
-    id: 1,
-    studentName: "John Doe",
-    studentId: "12345",
-    program: "Software Development",
-    term: "Fall 2023",
-    dateSubmitted: "2025-10-05",
-    status: "New",
-    messagePreview: "Hello, I would like to inquire about...",
-    fullMessage:
-      "Hello, I would like to inquire about the course syllabus for...",
-  },
-];
+import React, { useState } from "react";
+
 export default function SubmittedForms() {
+  const [selectedMessage, setSelectedMessage] = useState(null);
+  // Simulated Data for messages and students
+  const mockMessages = [
+    {
+      id: 1,
+      studentName: "John Doe",
+      studentId: "12345",
+      program: "Software Development",
+      term: "Fall 2023",
+      dateSubmitted: "2025-10-05",
+      status: "New",
+      messagePreview: "Hello, I would like to inquire about...",
+      fullMessage:
+        "Hello, I would like to inquire about the course syllabus for...",
+    },
+  ];
   return (
     <div className="flex flex-col items-center gap-6 py-10">
       <div className="text-center space-y-2">
