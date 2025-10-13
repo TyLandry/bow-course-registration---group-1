@@ -14,7 +14,18 @@ export default function SubmittedForms() {
       status: "New",
       messagePreview: "Hello, I would like to inquire about...",
       fullMessage:
-        "Hello, I would like to inquire about the course syllabus for...",
+        "Hello, I would like to inquire about the course syllabus, would that be possible?",
+    },
+    {
+      id: 2,
+      studentName: "Jane Smith",
+      studentId: "12346",
+      program: "Software Development",
+      term: "Winter 2024",
+      dateSubmitted: "2025-09-29",
+      status: "Read",
+      messagePreview: "Can I update my registration?",
+      fullMessage: "Can I update my registration for Software Security 101?",
     },
   ];
   return (
@@ -31,7 +42,7 @@ export default function SubmittedForms() {
         </button>
       </div>
 
-      {/* For forms list */}
+      {/* Forms list */}
       <div className="max-w-6xl mx-auto px-6 mt-28">
         <h2 className="font-bold text-xl">Forms List</h2>
         <p className="text-gray-600 py-3">
@@ -48,24 +59,9 @@ export default function SubmittedForms() {
               {/* Top Row: Student info + ID + Term */}
               <div className="flex flex-wrap justify-between items-center">
                 <div className="flex items-center gap-3">
-                  {/* Icon placeholder */}
                   <div className="w-10 h-10 bg-gray-200 flex items-center justify-center rounded-full">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                      className="w-6 h-6 text-gray-500"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M15.75 9V5.25m0 0L12 9m3.75-3.75L19.5 9M4.5 12.75V18a2.25 2.25 0 002.25 2.25h10.5A2.25 2.25 0 0019.5 18v-5.25M4.5 12.75l7.5-7.5 7.5 7.5"
-                      />
-                    </svg>
+                    {/* icon omitted for brevity */}
                   </div>
-
                   <div>
                     <p className="font-semibold text-blue-600 hover:underline cursor-pointer">
                       {msg.studentName}
@@ -83,12 +79,16 @@ export default function SubmittedForms() {
                 </div>
               </div>
 
-              {/* Middle Row: Date + Status + Message Preview */}
+              {/* Middle Row */}
               <div className="mt-4 flex flex-wrap justify-between items-center text-sm text-gray-600">
                 <p>Date Submitted: {msg.dateSubmitted}</p>
                 <p>
                   Status:{" "}
-                  <span className="font-medium text-green-600">
+                  <span
+                    className={`font-medium ${
+                      msg.status === "Read" ? "text-gray-600" : "text-green-600"
+                    }`}
+                  >
                     {msg.status}
                   </span>
                 </p>
@@ -104,7 +104,10 @@ export default function SubmittedForms() {
 
               {/* Bottom Link */}
               <div className="mt-4 text-right">
-                <button className="text-blue-600 font-medium hover:underline">
+                <button
+                  onClick={() => setSelectedMessage(msg)}
+                  className="text-blue-600 font-medium hover:underline"
+                >
                   View Full Message →
                 </button>
               </div>
@@ -112,10 +115,75 @@ export default function SubmittedForms() {
           ))}
         </div>
 
-        {/* For message details space */}
-        <div className="flex mt-10">
-          <p>I’m here</p>
-        </div>
+        {/* Message details (conditional) */}
+        {selectedMessage && (
+          <div className="flex items-center text-start flex-col mt-10">
+            <h2 className="font-bold text-xl">Message details</h2>
+            <p className="text-gray-600 py-3">
+              Overview of submitted student messages.
+            </p>
+
+            <div className="rounded-lg border shadow-md bg-white p-6 max-w-xl">
+              <div className="mb-4">
+                <p className="font-semibold">
+                  From: {selectedMessage.studentName} (
+                  {selectedMessage.studentId})
+                </p>
+                <p className="text-sm text-gray-500">
+                  Program: {selectedMessage.program} • Term:{" "}
+                  {selectedMessage.term}
+                </p>
+              </div>
+
+              <div className="rounded-md bg-gray-50 p-4">
+                <h3 className="font-bold mb-2">Full Message</h3>
+                <p className="text-gray-700">{selectedMessage.fullMessage}</p>
+              </div>
+
+              <div className="mt-4 flex justify-between gap-3 py-2">
+                <div>
+                  {" "}
+                  <button className="btn-primary-outlined text-sm mx-2">
+                    <p className="py-2 px-3">Archive</p>
+                  </button>
+                  <button className=" btn-primary-fill py-2 px-3 text-sm">
+                    Mark as Read
+                  </button>
+                </div>
+                  
+                <button
+                  onClick={() => setSelectedMessage(null)}
+                  className="btn-secondary py-2 px-3 text-sm"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* For message details space
+        <div>
+          {selectedMessage && (
+            <div className="flex items-center flex-col max-w-6xl mx-auto px-6 mt-28">
+              <div>
+                <h2 className="font-bold text-xl">Message details</h2>
+                <p className="text-gray-600 py-3">
+                  Overview of submitted student messages.
+                </p>
+              </div>
+              <div className="rounded-md p-6 flex flex-col gap-4 border shadow-md md:w-96">
+                <div className="rounded-md p-6 flex flex-col gap-4 border bg-gray-300">
+                  <h2 className="font-bold">Full Message</h2>
+                  <p>
+                    <span className="font-medium"></span>{" "}
+                    {selectedMessage.fullMessage}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div> */}
 
         {/* Search and Filter panel */}
         <div className="flex flex-col mt-10 px-8 md:px-16 lg:px-24">
