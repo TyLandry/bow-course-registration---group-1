@@ -8,6 +8,8 @@ import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignupPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import SubmittedForms from "./pages/SubmittedForms";
+import ContactPage from "./pages/ContactPage";
+import CourseRegistration from "./pages/CourseRegistration";
 
 export default function App() {
   return (
@@ -24,6 +26,8 @@ export default function App() {
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/submitted-forms" element={<SubmittedForms />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/course-registration" element={<CourseRegistration />} />
           </Routes>
         </div>
         <Footer />

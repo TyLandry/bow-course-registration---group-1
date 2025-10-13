@@ -1,50 +1,82 @@
 [
   {
     "name": "Introduction to Programming",
-    "code": "PROG-101",
-    "term": "Fall 2023",
-    "start": "September 5, 2023",
-    "end": "December 15, 2023",
+    "code": "CS101",
+    "term": "Fall 2025",
+    "start": "September 5, 2025",
+    "end": "December 15, 2025",
     "desc": "Learn the fundamentals of programming using Python, including variables, data types, control structures, and functions."
   },
   {
-    "name": "Web Development Basics",
-    "code": "WEB-102",
-    "term": "Fall 2023",
-    "start": "September 5, 2023",
-    "end": "December 15, 2023",
+    "name": "Web Development Fundamentals",
+    "code": "CS220",
+    "term": "Fall 2025",
+    "start": "September 5, 2025",
+    "end": "December 15, 2025",
     "desc": "Introduction to HTML, CSS, and JavaScript to build responsive and interactive websites."
   },
   {
     "name": "Data Structures and Algorithms",
-    "code": "DSA-201",
-    "term": "Winter 2024",
-    "start": "January 10, 2024",
-    "end": "April 25, 2024",
+    "code": "CS201",
+    "term": "Fall 2025",
+    "start": "September 5, 2025",
+    "end": "December 15, 2025",
     "desc": "Learn common data structures, algorithms, and problem-solving techniques for efficient coding."
   },
   {
-    "name": "Database Fundamentals",
-    "code": "DB-301",
-    "term": "Winter 2024",
-    "start": "January 10, 2024",
-    "end": "April 25, 2024",
+    "name": "Object-Oriented Programming",
+    "code": "CS150",
+    "term": "Fall 2025",
+    "start": "September 5, 2025",
+    "end": "December 15, 2025",
+    "desc": "Learn object-oriented programming concepts using Java including classes, inheritance, and polymorphism."
+  },
+  {
+    "name": "Database Systems",
+    "code": "CS230",
+    "term": "Winter 2025",
+    "start": "January 10, 2025",
+    "end": "April 25, 2025",
     "desc": "Introduction to relational databases, SQL queries, and database design principles."
   },
   {
     "name": "Mobile App Development",
-    "code": "MOB-401",
-    "term": "Spring 2024",
-    "start": "May 1, 2024",
-    "end": "August 15, 2024",
-    "desc": "Learn to develop mobile applications for iOS and Android using Flutter and Dart."
+    "code": "CS240",
+    "term": "Spring 2025",
+    "start": "May 1, 2025",
+    "end": "August 15, 2025",
+    "desc": "Learn to develop mobile applications for iOS and Android using React Native and Flutter."
   },
   {
-    "name": "Introduction to Cybersecurity",
-    "code": "CYB-101",
-    "term": "Spring 2024",
-    "start": "May 1, 2024",
-    "end": "August 15, 2024",
-    "desc": "Learn the fundamentals of cybersecurity, including network security, encryption, and ethical hacking basics."
+    "name": "Software Engineering",
+    "code": "CS250",
+    "term": "Spring 2025",
+    "start": "May 1, 2025",
+    "end": "August 15, 2025",
+    "desc": "Learn software development methodologies, version control, testing, and project management."
+  },
+  {
+    "name": "DevOps and Cloud Computing",
+    "code": "CS280",
+    "term": "Summer 2025",
+    "start": "June 15, 2025",
+    "end": "August 30, 2025",
+    "desc": "Learn DevOps practices, CI/CD pipelines, and cloud platforms like AWS and Docker."
+  },
+  {
+    "name": "Frontend Frameworks",
+    "code": "CS260",
+    "term": "Summer 2025",
+    "start": "June 15, 2025",
+    "end": "August 30, 2025",
+    "desc": "Master modern frontend frameworks including React, Vue.js, and Angular."
+  },
+  {
+    "name": "Backend Development",
+    "code": "CS270",
+    "term": "Summer 2025",
+    "start": "June 15, 2025",
+    "end": "August 30, 2025",
+    "desc": "Build robust backend systems using Node.js, Express, and RESTful APIs."
   }
 ]

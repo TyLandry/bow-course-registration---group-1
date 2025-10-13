@@ -49,6 +49,18 @@ export default function Header() {
             Design Library
           </Link>
           <Link
+            to="/contact"
+            className="px-3 py-2 text-sm rounded hover:text-[var(--system-orange)]"
+          >
+            Contact
+          </Link>
+          <Link
+            to="/course-registration"
+            className="px-3 py-2 text-sm rounded hover:text-[var(--system-orange)]"
+          >
+            Register
+          </Link>
+          <Link
             to="/student-dashboard"
             className="px-3 py-2 text-sm rounded hover:text-[var(--system-orange)]"
           >

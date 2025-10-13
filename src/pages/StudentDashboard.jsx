@@ -11,90 +11,48 @@ export default function StudentDashboard() {
   const [selectedTerm, setSelectedTerm] = useState("Fall 2025");
   const [enrolledCourses, setEnrolledCourses] = useState([]);
 
-  // Simulate fetching enrolled courses for the selected term
+  // Load enrolled courses from localStorage and filter by selected term
   useEffect(() => {
-    // Mock data for different terms, generated from chatGPT.
-    const coursesByTerm = {
-      "Spring 2025": [
-        {
-          code: "CS201",
-          name: "Data Structures & Algorithms",
-          instructor: "Dr. Ada Lovelace",
-          term: "Spring 2025",
-          status: "Completed",
-        },
-        {
-          code: "CS220",
-          name: "Web Development Fundamentals",
-          instructor: "Mr. Alan Turing",
-          term: "Spring 2025",
-          status: "Completed",
-        },
-      ],
-      "Summer 2025": [
-        {
-          code: "CS230",
-          name: "Database Systems",
-          instructor: "Dr. Grace Hopper",
-          term: "Summer 2025",
-          status: "In Progress",
-        },
-        {
-          code: "CS240",
-          name: "Mobile App Development",
-          instructor: "Ms. Margaret Hamilton",
-          term: "Summer 2025",
-          status: "In Progress",
-        },
-      ],
-      "Fall 2025": [
-        {
-          code: "CS250",
-          name: "Software Engineering",
-          instructor: "Dr. Linus Torvalds",
-          term: "Fall 2025",
-          status: "In Progress",
-        },
-        {
-          code: "CS260",
-          name: "Frontend Frameworks",
-          instructor: "Ms. Tracy Chou",
-          term: "Fall 2025",
-          status: "In Progress",
-        },
-        {
-          code: "CS270",
-          name: "Backend Development",
-          instructor: "Mr. Brendan Eich",
-          term: "Fall 2025",
-          status: "In Progress",
-        },
-        {
-          code: "CS280",
-          name: "DevOps & Cloud",
-          instructor: "Ms. Kelsey Hightower",
-          term: "Fall 2025",
-          status: "In Progress",
-        },
-      ],
-      "Winter 2025": [
-        {
-          code: "CS290",
-          name: "Machine Learning Basics",
-          instructor: "Dr. Fei-Fei Li",
-          term: "Winter 2025",
-          status: "Planned",
-        },
-        {
-          code: "CS295",
-          name: "Capstone Project",
-          instructor: "Dr. Tim Berners-Lee",
-          term: "Winter 2025",
-          status: "Planned",
-        },
-      ],
+    const savedCourses = localStorage.getItem('registeredCourses');
+    if (savedCourses) {
+      const allRegisteredCourses = JSON.parse(savedCourses);
+      // Filter courses by selected term
+      const coursesForTerm = allRegisteredCourses.filter(
+        course => course.term === selectedTerm
+      );
+      setEnrolledCourses(coursesForTerm);
+    } else {
+      // If no saved courses, show empty list
+      setEnrolledCourses([]);
+    }
+  }, [selectedTerm]);
+
+  // Listen for localStorage changes to update courses in real-time
+  useEffect(() => {
+    const handleStorageChange = () => {
+      console.log('Storage change detected in StudentDashboard');
+      const savedCourses = localStorage.getItem('registeredCourses');
+      if (savedCourses) {
+        const allRegisteredCourses = JSON.parse(savedCourses);
+        console.log('All registered courses:', allRegisteredCourses);
+        const coursesForTerm = allRegisteredCourses.filter(
+          course => course.term === selectedTerm
+        );
+        console.log('Courses for term', selectedTerm, ':', coursesForTerm);
+        setEnrolledCourses(coursesForTerm);
+      }
     };
-    setEnrolledCourses(coursesByTerm[selectedTerm] || []);
+
+    // Listen for storage events (when localStorage changes in other tabs/components)
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Custom event for same-tab localStorage changes
+    window.addEventListener('localStorageChange', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('localStorageChange', handleStorageChange);
+    };
   }, [selectedTerm]);
 
   // Handle navigation to course details page, passing the course code as state
