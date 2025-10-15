@@ -26,33 +26,33 @@ function HomePage() {
       <div>
         <h2 className="font-semibold">Available Programs</h2>
         <div className="flex flex-row flex-wrap gap-2 mt-2 justify-center">
-          <>
-            {programs.slice(0, 3).map((p) => (
-              <Program
-                name={p.name}
-                id={p.id}
-                term={p.term}
-                start={p.start}
-                end={p.end}
-                fees={p.fees}
-                desc={p.desc}
-              />
-            ))}
-            {programShow &&
-              programs
-                .slice(3)
-                .map((p) => (
-                  <Program
-                    name={p.name}
-                    id={p.id}
-                    term={p.term}
-                    start={p.start}
-                    end={p.end}
-                    fees={p.fees}
-                    desc={p.desc}
-                  />
-                ))}
-          </>
+          {programs.slice(0, 3).map((p) => (
+            <Program
+              key={p.id}
+              name={p.name}
+              id={p.id}
+              term={p.term}
+              start={p.start}
+              end={p.end}
+              fees={p.fees}
+              desc={p.desc}
+            />
+          ))}
+          {programShow &&
+            programs
+              .slice(3)
+              .map((p) => (
+                <Program
+                  key={p.id}
+                  name={p.name}
+                  id={p.id}
+                  term={p.term}
+                  start={p.start}
+                  end={p.end}
+                  fees={p.fees}
+                  desc={p.desc}
+                />
+              ))}
         </div>
         {programs.length > 3 && (
           <button
@@ -80,31 +80,31 @@ function HomePage() {
             </tr>
           </thead>
           <tbody>
-            <>
-              {courses.slice(0, 4).map((p) => (
-                <Course
-                  name={p.name}
-                  code={p.code}
-                  term={p.term}
-                  start={p.start}
-                  end={p.end}
-                  desc={p.desc}
-                />
-              ))}
-              {courseShow &&
-                courses
-                  .slice(4)
-                  .map((p) => (
-                    <Course
-                      name={p.name}
-                      code={p.code}
-                      term={p.term}
-                      start={p.start}
-                      end={p.end}
-                      desc={p.desc}
-                    />
-                  ))}
-            </>
+            {courses.slice(0, 4).map((p) => (
+              <Course
+                key={p.code}
+                name={p.name}
+                code={p.code}
+                term={p.term}
+                start={p.start}
+                end={p.end}
+                desc={p.desc}
+              />
+            ))}
+            {courseShow &&
+              courses
+                .slice(4)
+                .map((p) => (
+                  <Course
+                    key={p.code}
+                    name={p.name}
+                    code={p.code}
+                    term={p.term}
+                    start={p.start}
+                    end={p.end}
+                    desc={p.desc}
+                  />
+                ))}
           </tbody>
         </table>
         {courses.length > 4 && (

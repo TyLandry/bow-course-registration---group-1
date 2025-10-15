@@ -8,7 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 export default function StudentDashboard() {
   const navigate = useNavigate();
   const [studentName] = useState("John Doe");
-  const [selectedTerm, setSelectedTerm] = useState("Fall 2025");
+  const [selectedTerm, setSelectedTerm] = useState("Fall");
   const [enrolledCourses, setEnrolledCourses] = useState([]);
 
   // Load enrolled courses from localStorage and filter by selected term
@@ -16,9 +16,9 @@ export default function StudentDashboard() {
     const savedCourses = localStorage.getItem('registeredCourses');
     if (savedCourses) {
       const allRegisteredCourses = JSON.parse(savedCourses);
-      // Filter courses by selected term
+      // Filter courses by selected term using partial matching
       const coursesForTerm = allRegisteredCourses.filter(
-        course => course.term === selectedTerm
+        course => course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
       );
       setEnrolledCourses(coursesForTerm);
     } else {
@@ -36,7 +36,7 @@ export default function StudentDashboard() {
         const allRegisteredCourses = JSON.parse(savedCourses);
         console.log('All registered courses:', allRegisteredCourses);
         const coursesForTerm = allRegisteredCourses.filter(
-          course => course.term === selectedTerm
+          course => course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
         );
         console.log('Courses for term', selectedTerm, ':', coursesForTerm);
         setEnrolledCourses(coursesForTerm);
@@ -57,7 +57,7 @@ export default function StudentDashboard() {
 
   // Handle navigation to course details page, passing the course code as state
   const handleViewDetails = (courseCode) => {
-    navigate(`/course-details`, { state: { courseCode } });
+    navigate(`/course-details/${courseCode}`, { state: { fromStudent: true } });
   };
   // Mock notifications data
   // bell icon is copy/pasted from emojipedia.org
@@ -94,7 +94,7 @@ export default function StudentDashboard() {
       <div>
         <h3 className="text-sm font-semibold mb-2">Select Term</h3>
         <div className="flex gap-3">
-          {["Spring 2025", "Summer 2025", "Fall 2025", "Winter 2025"].map(
+          {["Fall", "Winter", "Spring", "Summer"].map(
             (term) => (
               <button
                 key={term}

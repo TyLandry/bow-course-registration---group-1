@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import coursesData from '../temp_data/courses.json';
 
 function CourseRegistration() {
   const navigate = useNavigate();
-  const [selectedTerm, setSelectedTerm] = useState('Fall 2025');
+  const [selectedTerm, setSelectedTerm] = useState('Fall');
   const [availableCourses, setAvailableCourses] = useState([]);
+  const [allCourses, setAllCourses] = useState([]); // Store all courses from localStorage
 
   // Load registered courses from localStorage or use default
   // this state persists across page reloads, so users don't lose their selections
@@ -49,19 +49,61 @@ function CourseRegistration() {
   });
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Available terms
-  const terms = ['Spring 2025', 'Summer 2025', 'Fall 2025', 'Winter 2025'];
+  // Available terms - simple season options without year limitations
+  const terms = ['All Terms', 'Fall', 'Winter', 'Spring', 'Summer'];
 
-  // this effect updates available courses when selectedTerm changes
-  // Filter courses based on selected term
-  // this ensures the available courses list is always relevant to the chosen term
-  // this is localstorage, it's not server data
+  // Load all courses from localStorage (admin-added courses)
   useEffect(() => {
-    const filtered = coursesData.filter(
-      (course) => course.term === selectedTerm
-    );
+    const loadCourses = () => {
+      const savedCourses = localStorage.getItem('courses');
+      if (savedCourses) {
+        const courses = JSON.parse(savedCourses);
+        // Only show Active courses for registration
+        const activeCourses = courses.filter(course => course.status === 'Active');
+        setAllCourses(activeCourses);
+      } else {
+        setAllCourses([]);
+      }
+    };
+
+    // Load courses initially
+    loadCourses();
+
+    // Listen for localStorage changes (when admin adds courses)
+    const handleStorageChange = () => {
+      loadCourses();
+    };
+
+    // Add event listener for storage changes
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Custom event for same-window localStorage changes
+    window.addEventListener('localStorageChange', handleStorageChange);
+
+    // Cleanup event listeners
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('localStorageChange', handleStorageChange);
+    };
+  }, []);
+
+  // Filter courses based on selected term
+  // This updates whenever the term changes or new courses are added by admin
+  useEffect(() => {
+    const filtered = allCourses.filter((course) => {
+      // More flexible term matching - includes partial matches
+      if (selectedTerm === 'All Terms') {
+        return true; // Show all courses if "All Terms" is selected
+      }
+      
+      // Extract the season from selected term (e.g., "Fall" from "Fall 2025")
+      const selectedSeason = selectedTerm.split(' ')[0];
+      
+      // Check if course term includes the selected season
+      return course.term && course.term.toLowerCase().includes(selectedSeason.toLowerCase());
+    });
     setAvailableCourses(filtered);
-  }, [selectedTerm]);
+  }, [selectedTerm, allCourses]);
 
   // Save registered courses to localStorage whenever they change
   useEffect(() => {
@@ -89,41 +131,68 @@ function CourseRegistration() {
       return;
     }
 
-    // Assign instructor based on course code (matching StudentDashboard data)
-    const instructorMap = {
-      CS201: 'Dr. Ada Lovelace',
-      CS220: 'Mr. Alan Turing',
-      CS230: 'Dr. Grace Hopper',
-      CS240: 'Ms. Margaret Hamilton',
-      CS250: 'Dr. Linus Torvalds',
-      CS260: 'Ms. Tracy Chou',
-      CS270: 'Mr. Brendan Eich',
-      CS280: 'Ms. Kelsey Hightower',
-      CS290: 'Dr. Fei-Fei Li',
-      CS295: 'Dr. Tim Berners-Lee',
-    };
-
     const newRegisteredCourse = {
       code: course.code,
       name: course.name,
-      instructor: instructorMap[course.code] || 'TBD',
+      instructor: course.professor || 'TBD', // Use professor field from admin-added courses
       term: course.term,
       status: 'In Progress',
     };
 
-    setRegisteredCourses([...registeredCourses, newRegisteredCourse]);
+    const updatedRegisteredCourses = [...registeredCourses, newRegisteredCourse];
+    setRegisteredCourses(updatedRegisteredCourses);
+    
+    // Save to localStorage
+    localStorage.setItem('registeredCourses', JSON.stringify(updatedRegisteredCourses));
+    
+    // Dispatch custom event for real-time updates to StudentDashboard
+    window.dispatchEvent(new CustomEvent('localStorageChange', {
+      detail: { key: 'registeredCourses', newValue: JSON.stringify(updatedRegisteredCourses) }
+    }));
+
+    // Also save enrollment data for admin/course details view
+    const enrollmentData = {
+      courseCode: course.code,
+      courseName: course.name,
+      studentName: 'Current Student', // This would come from user authentication in a real app
+      studentId: 'STU001', // This would come from user authentication
+      enrollmentDate: new Date().toLocaleDateString(),
+      status: 'Enrolled'
+    };
+
+    // Get existing enrollments or create empty array
+    const existingEnrollments = JSON.parse(localStorage.getItem('courseEnrollments') || '[]');
+    
+    // Check if student is already enrolled in this course
+    const alreadyEnrolled = existingEnrollments.some(
+      enrollment => enrollment.courseCode === course.code && enrollment.studentId === 'STU001'
+    );
+
+    if (!alreadyEnrolled) {
+      existingEnrollments.push(enrollmentData);
+      localStorage.setItem('courseEnrollments', JSON.stringify(existingEnrollments));
+    }
   };
 
   // Remove course from registered courses
   const removeCourse = (courseCode) => {
-    setRegisteredCourses(
-      registeredCourses.filter((course) => course.code !== courseCode)
-    );
-  };
+    const updatedRegisteredCourses = registeredCourses.filter((course) => course.code !== courseCode);
+    setRegisteredCourses(updatedRegisteredCourses);
+    
+    // Save to localStorage
+    localStorage.setItem('registeredCourses', JSON.stringify(updatedRegisteredCourses));
+    
+    // Dispatch custom event for real-time updates to StudentDashboard
+    window.dispatchEvent(new CustomEvent('localStorageChange', {
+      detail: { key: 'registeredCourses', newValue: JSON.stringify(updatedRegisteredCourses) }
+    }));
 
-  // Handle submit term navigation
-  const handleSubmitTerm = () => {
-    navigate('/student-dashboard');
+    // Also remove from enrollments
+    const existingEnrollments = JSON.parse(localStorage.getItem('courseEnrollments') || '[]');
+    const updatedEnrollments = existingEnrollments.filter(
+      enrollment => !(enrollment.courseCode === courseCode && enrollment.studentId === 'STU001')
+    );
+    localStorage.setItem('courseEnrollments', JSON.stringify(updatedEnrollments));
   };
 
   return (
@@ -144,7 +213,6 @@ function CourseRegistration() {
             ))}
           </select>
         </div>
-        <button onClick={handleSubmitTerm} className="btn-primary-fill px-4 py-2 text-sm">Submit Term</button>
       </div>
 
       <div className="flex flex-col gap-4">
