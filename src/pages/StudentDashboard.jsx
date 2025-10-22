@@ -1,13 +1,15 @@
 //Import React and necessary hooks and components
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/authentication";
 // import coursesData from "../temp_data/courses.json";
 
 // This is the Student Dashboard component
 // It displays the student's name, registered courses, term selection, and notifications
 export default function StudentDashboard() {
   const navigate = useNavigate();
-  const [studentName] = useState("John Doe");
+  const { currentUser } = useAuth();
+  // const [studentName] = useState("John Doe");
   const [selectedTerm, setSelectedTerm] = useState("Fall");
   const [enrolledCourses, setEnrolledCourses] = useState([]);
 
@@ -82,9 +84,10 @@ export default function StudentDashboard() {
   return (
     <div className="flex flex-col gap-10">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Welcome, {studentName}!</h1>
+        {/* Mabnipulate the data inside of the local storage */}
+        <h1 className="text-2xl font-bold">Welcome, {currentUser.firstName + " " + currentUser.lastName}!</h1>
         <div className="w-12 h-12 bg-1 rounded-full flex items-center justify-center text-white font-bold text-xl">
-          {studentName
+          {currentUser.firstName
             .split(" ")
             .map((n) => n[0])
             .join("")}

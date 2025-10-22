@@ -32,7 +32,16 @@ function SignUpPage() {
     // Signup logic to be implemented
     setError("");
     try {
-      signup({ email: form.email, password: form.password, role: form.role });
+      signup({
+        email: form.email,
+        password: form.password,
+        role: form.role,
+        firstName: form.firstName,
+        lastName: form.lastName,
+        phone: form.phone,
+        birthday: form.birthday,
+        program: form.program,
+      });
     } catch (err) {
       setError(err.message || "Sign up failed.");
     }
@@ -154,7 +163,10 @@ function SignUpPage() {
           </div>
 
           <div className="flex gap-4 mt-6">
-            <button type="submit" className="btn-primary-fill py-2 px-4 text-sm">
+            <button
+              type="submit"
+              className="btn-primary-fill py-2 px-4 text-sm"
+            >
               Sign Up
             </button>
             <a href="/login">
@@ -170,3 +182,4 @@ function SignUpPage() {
 }
 
 export default SignUpPage;
+

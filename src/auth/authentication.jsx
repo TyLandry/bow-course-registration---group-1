@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
 
   const normalizeEmail = (e) => e.trim().toLowerCase();
 
-  const signup = ({ email, password, role }) => {
+  const signup = ({ email, password, role, firstName, lastName, phone, birthday, program }) => {
     const users = JSON.parse(localStorage.getItem("app_users") || "[]");
     const e = normalizeEmail(email);
 
@@ -28,14 +28,26 @@ export function AuthProvider({ children }) {
       throw new Error("Invalid email or password too short (min 6).");
     }
 
-    const user = { id: crypto.randomUUID(), email: e, password, role };
+    const user = {
+      id: crypto.randomUUID(),
+      email: e,
+      password,
+      role,
+      firstName,
+      lastName,
+      phone,
+      birthday,
+      program,
+    };
     users.push(user);
     localStorage.setItem("app_users", JSON.stringify(users));
 
     const { password: _pw, ...publicUser } = user;
-    localStorage.setItem("app_currentUser", JSON.stringify(publicUser));
-    setCurrentUser(publicUser);
-    nav(publicUser.role === "student" ? "/student-dashboard" : "/admin-dashboard", { replace: true });
+    localStorage.removeItem("app_currentUser", JSON.stringify(publicUser));
+    setCurrentUser(null);
+
+    nav("/login", { replace: true });
+
   };
 
   const login = (email, password) => {
@@ -47,9 +59,38 @@ export function AuthProvider({ children }) {
     const { password: _pw, ...publicUser } = match;
     localStorage.setItem("app_currentUser", JSON.stringify(publicUser));
     setCurrentUser(publicUser);
-    nav(publicUser.role === "student" ? "/student-dashboard" : "/admin-dashboard", { replace: true });
+    nav(
+      publicUser.role === "student" ? "/student-dashboard" : "/admin-dashboard",
+      { replace: true }
+    );
     return true;
   };
+
+  useEffect(() => {
+    const users = JSON.parse(localStorage.getItem("app_users") || "[]");
+
+    // Add dummy admin only if no admin exists
+    if (!users.some((u) => u.role === "admin")) {
+      const adminDummy = [
+        {
+          firstName: "Admin",
+          lastName: "User",
+          email: "admin@example.com",
+          phone: "123-456-7890",
+          birthday: "1990-01-01",
+          program: "Software Development (SD)",
+          password: "adminpass",
+          role: "admin",
+          id: crypto.randomUUID(),
+        },
+      ];
+
+      localStorage.setItem(
+        "app_users",
+        JSON.stringify([...users, ...adminDummy])
+      );
+    }
+  }, []);
 
   const logout = () => {
     localStorage.removeItem("app_currentUser");
@@ -65,3 +106,4 @@ export function AuthProvider({ children }) {
 }
 
 export const useAuth = () => useContext(AuthContext);
+

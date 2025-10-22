@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/authentication";
 // import coursesData from "../temp_data/courses.json";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const [adminName] = useState("John Doe");
+  const { currentUser } = useAuth();
+  // const [adminName] = useState("John Doe");
   const [selectedTerm, setSelectedTerm] = useState("Fall 2025");
   const [termCourses, setTermCourses] = useState([]);
 
@@ -146,7 +148,7 @@ export default function AdminDashboard() {
     <div className="flex flex-col gap-10">
       {/* Header Section */}
       <div>
-        <h1 className="text-2xl font-bold">Welcome, {adminName}!</h1>
+        <h1 className="text-2xl font-bold">Welcome, {currentUser.firstName + " " + currentUser.lastName}!</h1>
       </div>
 
       {/* Quick Actions Section*/}
