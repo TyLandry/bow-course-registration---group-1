@@ -1,10 +1,8 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
-import { useAuth } from "../auth/authentication";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../auth/authentication";
 
-export default function Header() {
+export default function HeaderDesktop() {
   const { currentUser, logout } = useAuth();
-  const location = useLocation();
 
   // only home, login, and signup when no one's logged in
   if (!currentUser) {
@@ -12,11 +10,11 @@ export default function Header() {
       <header className="bg-2 text-white py-2 px-3">
         <div className="mx-auto flex justify-between items-center">
           <h1 className="text-xl font-bold cursor-none">
-            <Link to="/home-page">Bow Course Registration</Link>
+            <Link to="/">Bow Course Registration</Link>
           </h1>
           <nav className="flex gap-4">
             <Link
-              to="/home-page"
+              to="/"
               className="px-3 py-2 text-sm rounded hover:text-[var(--system-orange)]"
             >
               Home
@@ -40,12 +38,12 @@ export default function Header() {
   }
 
   // student header (only visible inside /student-dashboard)
-  if (currentUser.role === "student") {
+  else if (currentUser.role === "student") {
     return (
       <header className="bg-2 text-white py-2 px-3">
         <div className="mx-auto flex justify-between items-center">
           <h1 className="text-xl font-bold cursor-none">
-            Bow Course Registration
+            <Link to="/student-dashboard">Bow Course Registration</Link>
           </h1>
           <nav className="flex gap-4">
             <Link
@@ -53,6 +51,12 @@ export default function Header() {
               className="px-3 py-2 text-sm rounded hover:text-[var(--system-orange)]"
             >
               Student Dashboard
+            </Link>
+            <Link
+              to="/profile"
+              className="px-3 py-2 text-sm rounded hover:text-[var(--system-orange)]"
+            >
+              Profile
             </Link>
             <Link
               to="/contact"
@@ -80,12 +84,12 @@ export default function Header() {
   }
 
   // admin header (only visible inside /admin-dashboard)
-  if (currentUser.role === "admin") {
+  else if (currentUser.role === "admin") {
     return (
       <header className="bg-2 text-white py-2 px-3">
         <div className="mx-auto flex justify-between items-center">
           <h1 className="text-xl font-bold cursor-none">
-            Bow Course Registration
+            <Link to="/admin-dashboard">Bow Course Registration</Link>
           </h1>
           <nav className="flex gap-4">
             <Link
@@ -105,7 +109,5 @@ export default function Header() {
         </div>
       </header>
     );
-  }
-
-  return null;
+  } else return null;
 }

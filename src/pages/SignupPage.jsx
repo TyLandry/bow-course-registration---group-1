@@ -49,24 +49,18 @@ function SignUpPage() {
 
   return (
     <div className="flex flex-col items-center gap-6 py-10">
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold">Sign Up</h1>
-        <p className="text-gray-600">Join us for exclusive benefits!</p>
-      </div>
-
-      <form
-        onSubmit={onSubmit}
-        className="flex justify-evenly items-start gap-80 mt-20"
-      >
+      <div className="flex flex-col gap-8 md:gap-0 md:flex-row w-[100%]">
         {/* Left section */}
-        <div className="flex flex-col self-center">
+        <div className="flex flex-col self-center md:w-[50%]">
           <h1 className="text-3xl font-bold">Create Your Account</h1>
           <p>Fill out this form to get started</p>
           {error && <p className="text-red-600 mt-3">{error}</p>}
         </div>
-
         {/* Right section */}
-        <div className="flex flex-col">
+        <form
+          onSubmit={onSubmit}
+          className="flex flex-col justify-center max-w-[400px] mx-auto"
+        >
           <label className="block mt-2 font-semibold">First Name</label>
           <input
             name="firstName"
@@ -74,7 +68,7 @@ function SignUpPage() {
             placeholder="First Name"
             value={form.firstName}
             onChange={onChange}
-            className="border border-gray-400 rounded-md px-3 py-2 w-[500px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
+            className="border border-gray-400 rounded-md px-3 py-2 w-[300px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
           />
 
           <label className="block mt-2 font-semibold">Last Name</label>
@@ -84,7 +78,7 @@ function SignUpPage() {
             placeholder="Last Name"
             value={form.lastName}
             onChange={onChange}
-            className="border border-gray-400 rounded-md px-3 py-2 w-[500px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
+            className="border border-gray-400 rounded-md px-3 py-2 w-[300px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
           />
 
           <label className="block mt-2 font-semibold">Email Address</label>
@@ -94,7 +88,7 @@ function SignUpPage() {
             placeholder="Email Address"
             value={form.email}
             onChange={onChange}
-            className="border border-gray-400 rounded-md px-3 py-2 w-[500px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
+            className="border border-gray-400 rounded-md px-3 py-2 w-[300px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
           />
 
           <label className="block mt-2 font-semibold">Phone</label>
@@ -104,7 +98,7 @@ function SignUpPage() {
             placeholder="Phone #"
             value={form.phone}
             onChange={onChange}
-            className="border border-gray-400 rounded-md px-3 py-2 w-[500px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
+            className="border border-gray-400 rounded-md px-3 py-2 w-[300px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
           />
 
           <label className="block mt-2 font-semibold">Birthday</label>
@@ -113,7 +107,7 @@ function SignUpPage() {
             type="date"
             value={form.birthday}
             onChange={onChange}
-            className="border border-gray-400 rounded-md px-3 py-2 w-[500px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
+            className="border border-gray-400 rounded-md px-3 py-2 w-[300px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
           />
 
           <label className="block mt-2 font-semibold">Program</label>
@@ -124,7 +118,7 @@ function SignUpPage() {
             placeholder="Choose Program"
             value={form.program}
             onChange={onChange}
-            className="border border-gray-400 rounded-md px-3 py-2 w-[500px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
+            className="border border-gray-400 rounded-md px-3 py-2 w-[300px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
           />
           <datalist id="programs">
             {programOptions.map((program) => (
@@ -139,7 +133,7 @@ function SignUpPage() {
             placeholder="Password"
             value={form.password}
             onChange={onChange}
-            className="border border-gray-400 rounded-md px-3 py-2 w-[500px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
+            className="border border-gray-400 rounded-md px-3 py-2 w-[300px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
           />
 
           <label className="block mt-2 mb-4 font-semibold">
@@ -175,11 +169,10 @@ function SignUpPage() {
               </button>
             </a>
           </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }
 
 export default SignUpPage;
-

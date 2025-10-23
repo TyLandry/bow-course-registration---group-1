@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Header from "./components/Header";
+import Header from "./components/Header/Header";
 import Footer from "./components/Footer";
 import DesingLibrary from "./pages/DesignLibrary";
 import HomePage from "./pages/HomePage";
@@ -27,37 +27,49 @@ export default function App() {
           <Header /> {/* Persistent header on all pages */}
           <div className="px-3 py-3 md:px-[100px] flex-1">
             <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/home-page" element={<HomePage />} />
-              <Route path="/design-library" element={<DesingLibrary />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignUpPage />} />
-              <Route path="/submitted-forms" element={<SubmittedForms />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route
-                path="/course-registration"
-                element={<CourseRegistration />}
-              />
-              <Route path="/course-management" element={<CourseManagement />} />
-              <Route
-                path="/course-details/:courseCode"
-                element={<CourseDetails />}
-              />
-              <Route path="/profile" element={<ProfilePage />} />
-
-              {/* Connecting Routes to their appropriate Roles and pages */}
-              <Route element={<ProtectionRoute />}>
-                <Route element={<RoleRoute allow={["student"]} />}>
+              <Route path="/">
+                <Route index={true} element={<HomePage />} />
+                <Route path="/design-library" element={<DesingLibrary />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/signup" element={<SignUpPage />} />
+                {/* Connecting Routes to their appropriate Roles and pages */}
+                <Route element={<ProtectionRoute />}>
+                  <Route element={<RoleRoute allow={["student"]} />}>
+                    <Route
+                      path="/student-dashboard"
+                      element={<StudentDashboard />}
+                    />
+                  </Route>
                   <Route
-                    path="/student-dashboard"
-                    element={<StudentDashboard />}
+                    path="/course-registration"
+                    element={<CourseRegistration />}
                   />
+
+                  <Route
+                    path="/course-details/:courseCode"
+                    element={<CourseDetails />}
+                  />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route element={<RoleRoute allow={["admin"]} />}>
+                    <Route
+                      path="/admin-dashboard"
+                      element={<AdminDashboard />}
+                    />
+                    <Route
+                      path="/course-management"
+                      element={<CourseManagement />}
+                    />
+                    <Route
+                      path="/submitted-forms"
+                      element={<SubmittedForms />}
+                    />
+                  </Route>
                 </Route>
-                <Route element={<RoleRoute allow={["admin"]} />}>
-                  <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                <Route element={<RoleRoute allow={["student", "admin"]} />}>
+                  <Route path="/profile" element={<ProfilePage />} />
                 </Route>
+                <Route path="*" element={<div>404 Not Found</div>} />
               </Route>
-              <Route path="*" element={<div>404 Not Found</div>} />
             </Routes>
           </div>
           <Footer />

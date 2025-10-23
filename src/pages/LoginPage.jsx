@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../auth/authentication";
 import { Link } from "react-router-dom";
 
@@ -17,29 +17,18 @@ function LoginPage() {
 
   return (
     <div className="flex flex-col items-center gap-6 py-10">
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold">Login to your account</h1>
-        <p className="text-gray-600">Enter your credentials to access your profile.</p>
-      </div>
-
-      <div className="flex gap-4 mt-6">
-        <button onClick={onSubmit} className="btn-primary-fill py-2 px-4 text-sm">
-          Login
-        </button>
-        <button className="btn-primary-outlined text-sm">
-          <p className="py-2 px-3">Forgot Password</p>
-        </button>
-      </div>
-
-      <form onSubmit={onSubmit} className="flex justify-evenly items-start gap-80 mt-40">
+      <div className="flex flex-col md:flex-row w-[100%]">
         {/* Left section */}
-        <div className="flex flex-col self-center">
-          <h1 className="text-3xl font-bold">Account Login</h1>
-          <p>Securely login to your account</p>
+        <div className="flex flex-col self-center md:w-[50%]">
+          <h1 className="text-3xl font-bold text-center">Account Login</h1>
+          <p className="text-center">Securely login to your account</p>
         </div>
 
         {/* Right section */}
-        <div className="flex flex-col">
+        <form
+          onSubmit={onSubmit}
+          className="flex flex-col justify-center max-w-[400px] mx-auto md:w-[50%]"
+        >
           {error && <p className="text-red-600 mb-2">{error}</p>}
 
           <label className="block mt-2 font-semibold">Username</label>
@@ -48,9 +37,11 @@ function LoginPage() {
             placeholder="Username / email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="border border-gray-400 rounded-md px-3 py-2 w-[500px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
+            className="border border-gray-400 rounded-md px-3 py-2 w-[300px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
           />
-          <p className="font-extralight text-gray-600 mb-4">We will never share your email</p>
+          <p className="font-extralight text-gray-600 mb-4">
+            We will never share your email
+          </p>
 
           <label className="block mb-2 font-semibold">Password</label>
           <input
@@ -58,12 +49,17 @@ function LoginPage() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="border border-gray-400 rounded-md px-3 py-2 w-[500px] focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="border border-gray-400 rounded-md px-3 py-2 w-[300px] focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <p className="font-extralight text-gray-600">Enter your correct combination</p>
+          <p className="font-extralight text-gray-600">
+            Enter your correct combination
+          </p>
 
           <div className="flex gap-4 mt-6">
-            <button type="submit" className="btn-primary-fill py-2 px-4 text-sm">
+            <button
+              type="submit"
+              className="btn-primary-fill py-2 px-4 text-sm"
+            >
               Login
             </button>
             <button type="button" className="btn-primary-outlined text-sm">
@@ -77,8 +73,8 @@ function LoginPage() {
               Sign up
             </Link>
           </p>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }
