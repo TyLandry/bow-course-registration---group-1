@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 
 function ContactPage() {
@@ -19,9 +20,18 @@ function ContactPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission here
+    // Save message to localStorage for admin to view
+    const prevMessages = JSON.parse(localStorage.getItem('submittedMessages') || '[]');
+    const newMessage = {
+      ...formData,
+      dateSubmitted: new Date().toISOString().split('T')[0],
+      status: 'New',
+      id: Date.now(),
+      messagePreview: formData.message.slice(0, 40) + (formData.message.length > 40 ? '...' : ''),
+      fullMessage: formData.message,
+    };
+    localStorage.setItem('submittedMessages', JSON.stringify([newMessage, ...prevMessages]));
     alert('Message sent successfully!');
-    // Reset form
     setFormData({
       fullName: '',
       email: '',

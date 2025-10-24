@@ -150,6 +150,29 @@ function CourseRegistration() {
       detail: { key: 'registeredCourses', newValue: JSON.stringify(updatedRegisteredCourses) }
     }));
 
+    // Build a notification and persist it so StudentDashboard will show it even if not mounted
+    const newNotification = {
+      icon: "🔔",
+      title: `You registered for ${course.name}`,
+      date: new Date().toLocaleDateString(),
+    };
+    try {
+      const prev = JSON.parse(localStorage.getItem('app_notifications') || '[]');
+      const next = [newNotification, ...prev];
+      localStorage.setItem('app_notifications', JSON.stringify(next));
+      // Notify same-tab listeners of notification storage change
+      window.dispatchEvent(new CustomEvent('localStorageChange', {
+        detail: { key: 'app_notifications', newValue: JSON.stringify(next) }
+      }));
+    } catch (e) {
+      // ignore storage errors
+    }
+
+    // Dispatch custom event for notifications (real-time)
+    window.dispatchEvent(new CustomEvent('courseAdded', {
+      detail: { courseName: course.name }
+    }));
+
     // Also save enrollment data for admin/course details view
     const enrollmentData = {
       courseCode: course.code,
@@ -221,12 +244,7 @@ function CourseRegistration() {
             <h2 className="font-semibold">Available Courses</h2>
           </div>
           <div className="flex items-center gap-2">
-            <input type="text" placeholder="Search in site" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            <button className="p-2 text-gray-500">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </button>
+            {/* Search input removed as requested */}
           </div>
         </div>
 

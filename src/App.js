@@ -12,6 +12,7 @@ import ContactPage from "./pages/ContactPage";
 import CourseRegistration from "./pages/CourseRegistration";
 import CourseManagement from "./pages/CourseManagement";
 import CourseDetails from "./pages/CourseDetails";
+import StudentListPage from "./pages/StudentListPage";
 
 // Router setup for authenticated navigation
 import { AuthProvider } from "./auth/authentication";
@@ -58,6 +59,10 @@ export default function App() {
                     <Route
                       path="/course-management"
                       element={<CourseManagement />}
+                    />
+                    <Route
+                      path="/student-list"
+                      element={<StudentListPage />}
                     />
                     <Route
                       path="/submitted-forms"

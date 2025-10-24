@@ -12,6 +12,41 @@ export default function StudentDashboard() {
   // const [studentName] = useState("John Doe");
   const [selectedTerm, setSelectedTerm] = useState("Fall");
   const [enrolledCourses, setEnrolledCourses] = useState([]);
+  // Notifications state (load from localStorage for persistence)
+  const [notifications, setNotifications] = useState(() => {
+    try {
+      const raw = localStorage.getItem('app_notifications');
+      if (raw) return JSON.parse(raw);
+    } catch (e) {
+      // ignore parse errors
+    }
+    return [
+      {
+        icon: "🔔",
+        title: "Registration for Spring 2024 opens in 2 days",
+        date: "October 15, 2023",
+      },
+      {
+        icon: "🔔",
+        title: "New announcement in CS101",
+        date: "October 12, 2023",
+      },
+      {
+        icon: "🔔",
+        title: "Grade posted for MATH204 Assignment 3",
+        date: "October 8, 2023",
+      },
+    ];
+  });
+
+  // Persist notifications when they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('app_notifications', JSON.stringify(notifications));
+    } catch (e) {
+      // ignore storage errors
+    }
+  }, [notifications]);
 
   // Load enrolled courses from localStorage and filter by selected term
   useEffect(() => {
@@ -57,41 +92,35 @@ export default function StudentDashboard() {
     };
   }, [selectedTerm]);
 
+  // Listen for course added event to show notification
+  useEffect(() => {
+    const handleCourseAdded = (e) => {
+      if (e.detail && e.detail.courseName) {
+        setNotifications((prev) => [
+          {
+            icon: "🔔",
+            title: `You registered for ${e.detail.courseName}`,
+            date: new Date().toLocaleDateString(),
+          },
+          ...prev,
+        ]);
+      }
+    };
+    window.addEventListener('courseAdded', handleCourseAdded);
+    return () => window.removeEventListener('courseAdded', handleCourseAdded);
+  }, []);
+
   // Handle navigation to course details page, passing the course code as state
   const handleViewDetails = (courseCode) => {
     navigate(`/course-details/${courseCode}`, { state: { fromStudent: true } });
   };
-  // Mock notifications data
-  // bell icon is copy/pasted from emojipedia.org
-  const notifications = [
-    {
-      icon: "🔔",
-      title: "Registration for Spring 2024 opens in 2 days",
-      date: "October 15, 2023",
-    },
-    {
-      icon: "🔔",
-      title: "New announcement in CS101",
-      date: "October 12, 2023",
-    },
-    {
-      icon: "🔔",
-      title: "Grade posted for MATH204 Assignment 3",
-      date: "October 8, 2023",
-    },
-  ];
   // main container with vertical layout and spacing. it includes sections for welcome message, term selection, registered courses, class schedule, and notifications.*Note: Notifications needs a route to Contact page, or we can create a separate Message page.
   return (
     <div className="flex flex-col gap-10">
       <div className="flex justify-between items-center">
         {/* Mabnipulate the data inside of the local storage */}
         <h1 className="text-2xl font-bold">Welcome, {currentUser.firstName + " " + currentUser.lastName}!</h1>
-        <div className="w-12 h-12 bg-1 rounded-full flex items-center justify-center text-white font-bold text-xl">
-          {currentUser.firstName
-            .split(" ")
-            .map((n) => n[0])
-            .join("")}
-        </div>
+        {/* Removed blue circle with initial */}
       </div>
 
       <div>
@@ -118,12 +147,20 @@ export default function StudentDashboard() {
       <div>
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-xl font-bold">Your Registered Courses</h2>
-          <Link
-            to="/course-registration"
-            className="btn-primary-fill py-2 px-4 text-sm"
-          >
-            Add Course
-          </Link>
+          <div className="flex gap-2">
+            <Link
+              to="/course-registration"
+              className="btn-primary-fill py-2 px-4 text-sm"
+            >
+              Add Course
+            </Link>
+            <Link
+              to="/profile"
+              className="btn-primary-fill py-2 px-4 text-sm"
+            >
+              View Profile
+            </Link>
+          </div>
         </div>
 
         <div className="mb-4">
@@ -184,10 +221,10 @@ export default function StudentDashboard() {
           </p>
         </div>
       </div>
-      {/* Notifications and Messages*/}
+      {/* Notifications */}
       <div className="max-w-2xl mx-auto w-full">
         <div className="flex items-center gap-2 mb-3">
-          <h2 className="text-lg font-bold">Notifications and Messages</h2>
+          <h2 className="text-lg font-bold">Notifications</h2>
           {/* Blue circle badge showing number of notifications */}
           <span className="bg-[var(--system-blue)] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
             {notifications.length}

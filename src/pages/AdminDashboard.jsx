@@ -98,7 +98,7 @@ export default function AdminDashboard() {
 
   // Handle navigation to course details page
   const handleViewCourseDetails = (courseCode) => {
-    navigate(`/course-details`, { state: { courseCode } });
+    navigate(`/course-details/${courseCode}`);
   };
 
   // Mock data for recent activity
@@ -213,7 +213,7 @@ export default function AdminDashboard() {
       <div>
         <h3 className="text-sm font-semibold mb-2">Select Term</h3>
         <div className="flex gap-3">
-          {["Spring 2025", "Summer 2025", "Fall 2025", "Winter 2025"].map(
+          {["Spring", "Summer", "Fall", "Winter"].map(
             (term) => (
               <button
                 key={term}
