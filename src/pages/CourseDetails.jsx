@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import coursesData from '../temp_data/courses.json';
 
 export default function CourseDetails() {
   const { courseCode } = useParams();
@@ -19,22 +18,13 @@ export default function CourseDetails() {
       return;
     }
 
-    // Load course data from localStorage first, then fallback to bundled temp data
-    const normalize = (c) => (c || '').toString().replace(/[^a-z0-9]/gi, '').toLowerCase();
-
+    // Load course data from localStorage
     const savedCourses = localStorage.getItem('courses');
-    let foundCourse = null;
     if (savedCourses) {
       const courses = JSON.parse(savedCourses);
-      foundCourse = courses.find(c => normalize(c.code) === normalize(courseCode));
+      const foundCourse = courses.find(c => c.code === courseCode);
+      setCourse(foundCourse);
     }
-
-    if (!foundCourse) {
-      // fallback to packaged temp data
-      foundCourse = coursesData.find(c => normalize(c.code) === normalize(courseCode));
-    }
-
-    setCourse(foundCourse);
 
     // Load enrolled students from localStorage (only for admin view)
     if (!isStudentView) {

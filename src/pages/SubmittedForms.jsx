@@ -44,7 +44,6 @@ export default function SubmittedForms() {
               <div className="flex flex-wrap justify-between items-center">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gray-200 flex items-center justify-center rounded-full">
-                    {/* icon omitted for brevity */}
                   </div>
                   <div>
                     <p className="font-semibold text-blue-600 hover:underline cursor-pointer">

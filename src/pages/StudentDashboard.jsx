@@ -118,9 +118,8 @@ export default function StudentDashboard() {
   return (
     <div className="flex flex-col gap-10">
       <div className="flex justify-between items-center">
-        {/* Mabnipulate the data inside of the local storage */}
+
         <h1 className="text-2xl font-bold">Welcome, {currentUser.firstName + " " + currentUser.lastName}!</h1>
-        {/* Removed blue circle with initial */}
       </div>
 
       <div>
