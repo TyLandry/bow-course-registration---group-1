@@ -26,6 +26,7 @@ export function AuthProvider({ children }) {
     phone,
     birthday,
     program,
+    department
   }) => {
     const users = JSON.parse(localStorage.getItem("app_users") || "[]");
     const e = normalizeEmail(email);
@@ -49,6 +50,7 @@ export function AuthProvider({ children }) {
       phone,
       birthday,
       program,
+      department
     };
     users.push(user);
     localStorage.setItem("app_users", JSON.stringify(users));
@@ -89,6 +91,7 @@ export function AuthProvider({ children }) {
           phone: "123-456-7890",
           birthday: "1990-01-01",
           program: "Software Development (SD)",
+          department: "Administration",
           password: "adminpass",
           role: "admin",
           id: crypto.randomUUID(),

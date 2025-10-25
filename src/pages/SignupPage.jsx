@@ -4,7 +4,11 @@ import { useAuth } from "../auth/authentication";
 function SignUpPage() {
   const countryOptions = ["USA", "Canada", "UK", "Australia"];
   const programOptions = ["Software Development (SD)"];
-
+  const departmentOptions = [
+    "Diploma (2 Years)",
+    "Post-Diploma (1 Year)",
+    "Certificate (6 Months)",
+  ];
   const [selectedCountry, setSelectedCountry] = useState("Canada");
 
   const { signup } = useAuth();
@@ -41,6 +45,7 @@ function SignUpPage() {
         phone: form.phone,
         birthday: form.birthday,
         program: form.program,
+        department: form.department,
       });
     } catch (err) {
       setError(err.message || "Sign up failed.");
@@ -125,6 +130,34 @@ function SignUpPage() {
               <option key={program} value={program} />
             ))}
           </datalist>
+
+          {/* Form will show once the user selects a program */}
+          {form.program === programOptions[0] && (
+            <div>
+              <label className="block mt-2 font-semibold">Department</label>
+              <input
+                name="department"
+                type="text"
+                list="departments"
+                placeholder="Department"
+                value={form.department}
+                onChange={onChange}
+                className="border border-gray-400 rounded-md px-3 py-2 w-[300px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
+              />
+              <datalist id="departments">
+                {departmentOptions.map((department) => (
+                  <option key={department} value={department} />
+                ))}
+              </datalist>
+
+              {/* show this part once the user has inputted something */}
+              {form.department && (
+                <p className="text-sm text-gray-600 mt-2">
+                  You selected: <strong>{form.department}</strong>
+                </p>
+              )}
+            </div>
+          )}
 
           <label className="block mt-2 font-semibold">Password</label>
           <input
