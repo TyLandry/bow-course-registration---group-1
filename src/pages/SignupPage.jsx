@@ -3,8 +3,8 @@ import { useAuth } from "../auth/authentication";
 
 function SignUpPage() {
   const countryOptions = ["USA", "Canada", "UK", "Australia"];
-  const programOptions = ["Software Development (SD)"];
-  const departmentOptions = [
+  const departmentOptions = ["Software Development (SD)"];
+  const programOptions = [
     "Diploma (2 Years)",
     "Post-Diploma (1 Year)",
     "Certificate (6 Months)",
@@ -115,45 +115,44 @@ function SignUpPage() {
             className="border border-gray-400 rounded-md px-3 py-2 w-[300px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
           />
 
-          <label className="block mt-2 font-semibold">Program</label>
+          <label className="block mt-2 font-semibold">Department</label>
           <input
-            name="program"
+            name="department"
             type="text"
-            list="programs"
-            placeholder="Choose Program"
-            value={form.program}
+            list="departments"
+            placeholder="Department"
+            value={form.department}
             onChange={onChange}
             className="border border-gray-400 rounded-md px-3 py-2 w-[300px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
           />
-          <datalist id="programs">
-            {programOptions.map((program) => (
-              <option key={program} value={program} />
+          <datalist id="departments">
+            {departmentOptions.map((department) => (
+              <option key={department} value={department} />
             ))}
           </datalist>
-
           {/* Form will show once the user selects a program */}
-          {form.program === programOptions[0] && (
+          {form.department === departmentOptions[0] && (
             <div>
-              <label className="block mt-2 font-semibold">Department</label>
+              <label className="block mt-2 font-semibold">Program</label>
               <input
-                name="department"
+                name="program"
                 type="text"
-                list="departments"
-                placeholder="Department"
-                value={form.department}
+                list="programs"
+                placeholder="Choose Program"
+                value={form.program}
                 onChange={onChange}
                 className="border border-gray-400 rounded-md px-3 py-2 w-[300px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
               />
-              <datalist id="departments">
-                {departmentOptions.map((department) => (
-                  <option key={department} value={department} />
+              <datalist id="programs">
+                {programOptions.map((program) => (
+                  <option key={program} value={program} />
                 ))}
               </datalist>
 
               {/* show this part once the user has inputted something */}
               {form.department && (
                 <p className="text-sm text-gray-600 mt-2">
-                  You selected: <strong>{form.department}</strong>
+                  You selected: <strong>{form.program}</strong>
                 </p>
               )}
             </div>
