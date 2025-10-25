@@ -19,7 +19,6 @@ function ProfilePage() {
       phone: currentUser.phone,
       birthday: currentUser.birthday,
       program: currentUser.program,
-      // department: currentUser.department,
     });
   }, [currentUser]);
 
@@ -49,8 +48,7 @@ function ProfilePage() {
     user.email = formData.email;
     user.phone = formData.phone;
     user.birthday = formData.birthday;
-    // user.program = formData.program
-    // user.department = formData.department
+    user.program = formData.program;
 
     for (var u in users) {
       if (u.id === user.id) {
@@ -88,20 +86,17 @@ function ProfilePage() {
             <div className="text-[var(--system-gray)]">Phone</div>
             <div>{currentUser?.phone || "—"}</div>
           </div>
-          {currentUser?.role === "student" && (
-            <div>
-              <div className="text-[var(--system-gray)]">Department</div>
-              <div>
-                {currentUser?.department || "Software Development - SD"}
-              </div>
-            </div>
-          )}
-          {currentUser?.role === "student" && (
-            <div>
-              <div className="text-[var(--system-gray)]">Program/Status</div>
-              <div>{currentUser?.program || "Computer Science"}</div>
-            </div>
-          )}
+
+          <div>
+            <div className="text-[var(--system-gray)]">Department</div>
+            <div>{currentUser?.department || "Software Development - SD"}</div>
+          </div>
+
+          <div>
+            <div className="text-[var(--system-gray)]">Program</div>
+            <div>{currentUser?.program || "Computer Science"}</div>
+          </div>
+
           <div>
             <div className="text-[var(--system-gray)]">Birthday</div>
             <div>{currentUser?.birthday || "—"}</div>
@@ -167,44 +162,30 @@ function ProfilePage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--system-blue)]"
                   />
                 </div>
-                {/* {currentUser?.role === "student" && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Department
-                      </label>
-                      <select
-                        name="department"
-                        value={formData.department}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--system-blue)]"
-                      >
-                        <option value="Fall">Fall</option>
-                        <option value="Winter">Winter</option>
-                        <option value="Spring">Spring</option>
-                        <option value="Summer">Summer</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold mb-1">
-                        Program
-                      </label>
-                      <select
-                        name="program"
-                        value={formData.program}
-                        onChange={handleInputChange}
-                        required
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--system-blue)]"
-                      >
-                        <option value="Fall">Fall</option>
-                        <option value="Winter">Winter</option>
-                        <option value="Spring">Spring</option>
-                        <option value="Summer">Summer</option>
-                      </select>
-                    </div>
-                  </>
-                )} */}
+                {currentUser?.role === "student" && (
+                  <div>
+                    <label className="block text-sm font-semibold mb-1">
+                      Program
+                    </label>
+                    <select
+                      name="program"
+                      value={formData.program}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--system-blue)]"
+                    >
+                      <option value="Diploma (2 Years)">
+                        Diploma (2 Years)
+                      </option>
+                      <option value="Post-Diploma (1 Year)">
+                        Post-Diploma (1 Year)
+                      </option>
+                      <option value="Certificate (6 Months)">
+                        Certificate (6 Months)
+                      </option>
+                    </select>
+                  </div>
+                )}
                 {/* Form Action Buttons */}
                 <div className="flex flex-col md:flex-row justify-end gap-3 pt-4">
                   <button
