@@ -161,7 +161,6 @@ export default function CourseManagement() {
   // Delete a course with confirmation
   const handleDeleteCourse = (courseCode) => {
     if (window.confirm('Are you sure you want to delete this course?')) {
-      const courseToDelete = courses.find(course => course.code === courseCode);
       const updatedCourses = courses.filter(course => course.code !== courseCode);
       setCourses(updatedCourses);
       localStorage.setItem('courses', JSON.stringify(updatedCourses));

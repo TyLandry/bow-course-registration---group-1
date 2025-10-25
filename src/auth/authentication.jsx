@@ -17,7 +17,16 @@ export function AuthProvider({ children }) {
 
   const normalizeEmail = (e) => e.trim().toLowerCase();
 
-  const signup = ({ email, password, role, firstName, lastName, phone, birthday, program }) => {
+  const signup = ({
+    email,
+    password,
+    role,
+    firstName,
+    lastName,
+    phone,
+    birthday,
+    program,
+  }) => {
     const users = JSON.parse(localStorage.getItem("app_users") || "[]");
     const e = normalizeEmail(email);
 
@@ -49,7 +58,6 @@ export function AuthProvider({ children }) {
     setCurrentUser(null);
 
     nav("/login", { replace: true });
-
   };
 
   const login = (email, password) => {
@@ -100,12 +108,17 @@ export function AuthProvider({ children }) {
     nav("/login", { replace: true });
   };
 
+  const setUser = (user) => {
+    setCurrentUser(user);
+  };
+
   return (
-    <AuthContext.Provider value={{ currentUser, isLoading, signup, login, logout }}>
+    <AuthContext.Provider
+      value={{ currentUser, isLoading, signup, login, logout, setUser }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
 
 export const useAuth = () => useContext(AuthContext);
-

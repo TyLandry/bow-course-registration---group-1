@@ -8,7 +8,6 @@ export default function AdminDashboard() {
   const { currentUser } = useAuth();
   const [selectedTerm, setSelectedTerm] = useState("Fall");
   const [termCourses, setTermCourses] = useState([]);
-  const [allCourses, setAllCourses] = useState([]);
 
   // Load courses from localStorage and filter by selected term
   useEffect(() => {
@@ -16,7 +15,6 @@ export default function AdminDashboard() {
       const savedCourses = localStorage.getItem('courses');
       if (savedCourses) {
         const courses = JSON.parse(savedCourses);
-        setAllCourses(courses);
         
         // Filter courses by selected term using partial matching
         const filteredCourses = courses.filter(course => 
@@ -24,7 +22,6 @@ export default function AdminDashboard() {
         );
         setTermCourses(filteredCourses);
       } else {
-        setAllCourses([]);
         setTermCourses([]);
       }
     };
@@ -38,7 +35,6 @@ export default function AdminDashboard() {
       const savedCourses = localStorage.getItem('courses');
       if (savedCourses) {
         const courses = JSON.parse(savedCourses);
-        setAllCourses(courses);
         
         // Filter courses by selected term using partial matching
         const filteredCourses = courses.filter(course => 

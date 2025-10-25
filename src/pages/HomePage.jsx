@@ -69,44 +69,46 @@ function HomePage() {
       </div>
       <div>
         <h2 className="font-semibold">Featured Courses</h2>
-        <table className="min-w-full divide-y divide-gray-200 border-[1px] border-[var(--system-purple)] mt-2">
-          <thead className="bg-1 text-white">
-            <tr className="text-xs font-medium">
-              <td className="p-2">Course Name</td>
-              <td className="p-2">Code</td>
-              <td className="p-2">Term</td>
-              <td className="p-2">Dates</td>
-              <td className="p-2">Description</td>
-            </tr>
-          </thead>
-          <tbody>
-            {courses.slice(0, 4).map((p) => (
-              <Course
-                key={p.code}
-                name={p.name}
-                code={p.code}
-                term={p.term}
-                start={p.start}
-                end={p.end}
-                desc={p.desc}
-              />
-            ))}
-            {courseShow &&
-              courses
-                .slice(4)
-                .map((p) => (
-                  <Course
-                    key={p.code}
-                    name={p.name}
-                    code={p.code}
-                    term={p.term}
-                    start={p.start}
-                    end={p.end}
-                    desc={p.desc}
-                  />
-                ))}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto max-w-full">
+          <table className="min-w-full divide-y divide-gray-200 border-[1px] border-[var(--system-purple)] mt-2">
+            <thead className="bg-1 text-white">
+              <tr className="text-xs font-medium">
+                <td className="p-2">Course Name</td>
+                <td className="p-2">Code</td>
+                <td className="p-2">Term</td>
+                <td className="p-2">Dates</td>
+                <td className="p-2">Description</td>
+              </tr>
+            </thead>
+            <tbody>
+              {courses.slice(0, 4).map((p) => (
+                <Course
+                  key={p.code}
+                  name={p.name}
+                  code={p.code}
+                  term={p.term}
+                  start={p.start}
+                  end={p.end}
+                  desc={p.desc}
+                />
+              ))}
+              {courseShow &&
+                courses
+                  .slice(4)
+                  .map((p) => (
+                    <Course
+                      key={p.code}
+                      name={p.name}
+                      code={p.code}
+                      term={p.term}
+                      start={p.start}
+                      end={p.end}
+                      desc={p.desc}
+                    />
+                  ))}
+            </tbody>
+          </table>
+        </div>
         {courses.length > 4 && (
           <button
             className="btn-primary-outlined mt-5 mx-auto block"
