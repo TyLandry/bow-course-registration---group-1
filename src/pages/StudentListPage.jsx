@@ -1,24 +1,79 @@
 import { useState, useEffect } from "react";
-import students from "../temp_data/students.json";
 import Student from "../components/Student";
 
 export default function StudentListPage() {
-  const [selectedProgram, setSelectedProgram] = useState("Diploma");
-  const [filteredStudent, setFilteredStudent] = useState(students);
+  const [students, setStudents] = useState([]);
+  const [selectedProgram, setSelectedProgram] = useState("All Programs");
+  const [filteredStudent, setFilteredStudent] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [studentShow, setStudentShow] = useState(false);
 
+  // Load students from localStorage on component mount
   useEffect(() => {
-    const result = students.filter((s) => s.program === selectedProgram);
-    setFilteredStudent(
-      result.filter(
-        (r) =>
-          r.firstName.toLowerCase().startsWith(searchValue.toLowerCase()) ||
-          r.lastName.toLowerCase().startsWith(searchValue.toLowerCase()) ||
-          r.id.toLowerCase().startsWith(searchValue.toLowerCase())
-      )
+    try {
+      const allUsers = JSON.parse(localStorage.getItem("app_users") || "[]");
+      console.log("All users from localStorage:", allUsers);
+      
+      // Filter only student users
+      const studentUsers = allUsers
+        .filter(user => user.role === "student")
+        .map(user => ({
+          ...user,
+          department: "Software Development", // Add default department since it's expected by Student component
+        }));
+      
+      console.log("Filtered student users:", studentUsers);
+      setStudents(studentUsers);
+    } catch (error) {
+      console.error("Error loading students:", error);
+      setStudents([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    console.log("Students state:", students);
+    console.log("Selected program:", selectedProgram);
+    console.log("Search value:", searchValue);
+    
+    if (students.length === 0) {
+      setFilteredStudent([]);
+      return;
+    }
+    
+    // Filter by program - simplified logic
+    let result = students;
+    if (selectedProgram !== "All Programs") {
+      result = students.filter((s) => {
+        if (!s.program) return false;
+        
+        // Simple case-insensitive includes check with null safety
+        const programLower = s.program.toLowerCase();
+        const selectedLower = selectedProgram.toLowerCase();
+        
+        return programLower.includes(selectedLower) || 
+               (selectedProgram === "Diploma" && programLower.includes("sd"));
+      });
+    }
+    
+    console.log("After program filter:", result);
+    
+    // Filter by search term with null safety
+    const finalResult = result.filter(
+      (r) => {
+        const firstName = r.firstName || "";
+        const lastName = r.lastName || "";
+        const id = r.id || "";
+        const searchLower = searchValue.toLowerCase();
+        
+        return firstName.toLowerCase().includes(searchLower) ||
+               lastName.toLowerCase().includes(searchLower) ||
+               id.toLowerCase().includes(searchLower);
+      }
     );
-  }, [selectedProgram, searchValue]);
+    
+    console.log("Final filtered result:", finalResult);
+    setFilteredStudent(finalResult);
+  }, [selectedProgram, searchValue, students]);
 
   return (
     <div className="flex flex-col gap-10">
@@ -40,7 +95,7 @@ export default function StudentListPage() {
       <div>
         <h2 className="font-semibold">Filter by Program</h2>
         <div className="flex gap-3 mt-4">
-          {["Diploma", "Post-Diploma", "Certificate"].map((program) => (
+          {["All Programs", "Diploma", "Post-Diploma", "Certificate"].map((program) => (
             <button
               key={program}
               onClick={() => setSelectedProgram(program)}
@@ -71,35 +126,47 @@ export default function StudentListPage() {
             </tr>
           </thead>
           <tbody>
-            <>
-              {filteredStudent.slice(0, 4).map((s) => (
-                <Student
-                  id={s.id}
-                  firstName={s.firstName}
-                  lastName={s.lastName}
-                  email={s.email}
-                  phone={s.phone}
-                  birthday={s.birthday}
-                  department={s.department}
-                  program={s.program}
-                />
-              ))}
-              {studentShow &&
-                filteredStudent
-                  .slice(4)
-                  .map((s) => (
-                    <Student
-                      id={s.id}
-                      firstName={s.firstName}
-                      lastName={s.lastName}
-                      email={s.email}
-                      phone={s.phone}
-                      birthday={s.birthday}
-                      department={s.department}
-                      program={s.program}
-                    />
-                  ))}
-            </>
+            {filteredStudent.length === 0 ? (
+              <tr>
+                <td colSpan="8" className="text-center py-8 text-[var(--system-gray)] text-sm">
+                  {students.length === 0 
+                    ? "No students found in the system." 
+                    : "No students found matching the current filter."}
+                </td>
+              </tr>
+            ) : (
+              <>
+                {filteredStudent.slice(0, 4).map((s) => (
+                  <Student
+                    key={s.id}
+                    id={s.id}
+                    firstName={s.firstName}
+                    lastName={s.lastName}
+                    email={s.email}
+                    phone={s.phone}
+                    birthday={s.birthday}
+                    department={s.department}
+                    program={s.program}
+                  />
+                ))}
+                {studentShow &&
+                  filteredStudent
+                    .slice(4)
+                    .map((s) => (
+                      <Student
+                        key={s.id}
+                        id={s.id}
+                        firstName={s.firstName}
+                        lastName={s.lastName}
+                        email={s.email}
+                        phone={s.phone}
+                        birthday={s.birthday}
+                        department={s.department}
+                        program={s.program}
+                      />
+                    ))}
+              </>
+            )}
           </tbody>
         </table>
         {filteredStudent.length > 4 && (

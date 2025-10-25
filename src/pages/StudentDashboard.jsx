@@ -20,23 +20,8 @@ export default function StudentDashboard() {
     } catch (e) {
       // ignore parse errors
     }
-    return [
-      {
-        icon: "🔔",
-        title: "Registration for Spring 2024 opens in 2 days",
-        date: "October 15, 2023",
-      },
-      {
-        icon: "🔔",
-        title: "New announcement in CS101",
-        date: "October 12, 2023",
-      },
-      {
-        icon: "🔔",
-        title: "Grade posted for MATH204 Assignment 3",
-        date: "October 8, 2023",
-      },
-    ];
+    // Start with empty notifications instead of mock data
+    return [];
   });
 
   // Persist notifications when they change
@@ -230,24 +215,30 @@ export default function StudentDashboard() {
           </span>
         </div>
         <div className="border-[1px] border-[var(--system-purple)] rounded-md">
-          {notifications.map((notification, index) => (
-            <div
-              key={index}
-              className={`flex items-start gap-3 p-4 ${
-                index !== notifications.length - 1
-                  ? "border-b border-gray-200"
-                  : ""
-              }`}
-            >
-              <span className="text-xl">{notification.icon}</span>
-              <div className="flex-1">
-                <p className="text-sm font-medium">{notification.title}</p>
-                <p className="text-xs text-[var(--system-gray)] mt-1">
-                  {notification.date}
-                </p>
-              </div>
+          {notifications.length === 0 ? (
+            <div className="p-4 text-center text-gray-500 text-sm">
+              No notifications at this time.
             </div>
-          ))}
+          ) : (
+            notifications.map((notification, index) => (
+              <div
+                key={index}
+                className={`flex items-start gap-3 p-4 ${
+                  index !== notifications.length - 1
+                    ? "border-b border-gray-200"
+                    : ""
+                }`}
+              >
+                <span className="text-xl">{notification.icon}</span>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{notification.title}</p>
+                  <p className="text-xs text-[var(--system-gray)] mt-1">
+                    {notification.date}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

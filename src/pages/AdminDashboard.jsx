@@ -6,143 +6,157 @@ import { useAuth } from "../auth/authentication";
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
-  // const [adminName] = useState("John Doe");
-  const [selectedTerm, setSelectedTerm] = useState("Fall 2025");
+  const [selectedTerm, setSelectedTerm] = useState("Fall");
   const [termCourses, setTermCourses] = useState([]);
+  const [allCourses, setAllCourses] = useState([]);
 
-  // Update courses when term changes
+  // Load courses from localStorage and filter by selected term
   useEffect(() => {
-    // Create mock courses for the selected term
-    const mockCoursesByTerm = {
-      "Spring 2025": [
-        {
-          name: "Advanced Web Development",
-          code: "WEB-301",
-          term: "Spring 2025",
-          start: "January 15, 2025",
-          end: "May 1, 2025",
-        },
-        {
-          name: "Machine Learning Basics",
-          code: "ML-101",
-          term: "Spring 2025",
-          start: "January 15, 2025",
-          end: "May 1, 2025",
-        },
-      ],
-      "Summer 2025": [
-        {
-          name: "Cloud Computing",
-          code: "CLOUD-201",
-          term: "Summer 2025",
-          start: "May 15, 2025",
-          end: "August 30, 2025",
-        },
-        {
-          name: "DevOps Fundamentals",
-          code: "DEV-301",
-          term: "Summer 2025",
-          start: "May 15, 2025",
-          end: "August 30, 2025",
-        },
-      ],
-      "Fall 2025": [
-        {
-          name: "Software Engineering",
-          code: "CS-250",
-          term: "Fall 2025",
-          start: "September 5, 2025",
-          end: "December 15, 2025",
-        },
-        {
-          name: "Frontend Frameworks",
-          code: "CS-260",
-          term: "Fall 2025",
-          start: "September 5, 2025",
-          end: "December 15, 2025",
-        },
-        {
-          name: "Backend Development",
-          code: "CS-270",
-          term: "Fall 2025",
-          start: "September 5, 2025",
-          end: "December 15, 2025",
-        },
-        {
-          name: "DevOps & Cloud",
-          code: "CS-280",
-          term: "Fall 2025",
-          start: "September 5, 2025",
-          end: "December 15, 2025",
-        },
-      ],
-      "Winter 2025": [
-        {
-          name: "AI and Ethics",
-          code: "AI-401",
-          term: "Winter 2025",
-          start: "January 5, 2026",
-          end: "April 20, 2026",
-        },
-        {
-          name: "Capstone Project",
-          code: "CAP-499",
-          term: "Winter 2025",
-          start: "January 5, 2026",
-          end: "April 20, 2026",
-        },
-      ],
+    const loadCourses = () => {
+      const savedCourses = localStorage.getItem('courses');
+      if (savedCourses) {
+        const courses = JSON.parse(savedCourses);
+        setAllCourses(courses);
+        
+        // Filter courses by selected term using partial matching
+        const filteredCourses = courses.filter(course => 
+          course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
+        );
+        setTermCourses(filteredCourses);
+      } else {
+        setAllCourses([]);
+        setTermCourses([]);
+      }
     };
-    setTermCourses(mockCoursesByTerm[selectedTerm] || []);
+
+    loadCourses();
   }, [selectedTerm]);
+
+  // Listen for localStorage changes to update courses in real-time
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedCourses = localStorage.getItem('courses');
+      if (savedCourses) {
+        const courses = JSON.parse(savedCourses);
+        setAllCourses(courses);
+        
+        // Filter courses by selected term using partial matching
+        const filteredCourses = courses.filter(course => 
+          course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
+        );
+        setTermCourses(filteredCourses);
+      }
+      
+      // Also reload notifications when storage changes
+      try {
+        const savedNotifications = localStorage.getItem('admin_notifications');
+        if (savedNotifications) {
+          setNotifications(JSON.parse(savedNotifications));
+        }
+      } catch (e) {
+        console.error('Error loading notifications:', e);
+      }
+    };
+
+    // Listen for storage events and custom events
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('localStorageChange', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('localStorageChange', handleStorageChange);
+    };
+  }, [selectedTerm]);
+
+  // Admin notifications state (load from localStorage for persistence)
+  const [notifications, setNotifications] = useState(() => {
+    try {
+      const raw = localStorage.getItem('admin_notifications');
+      if (raw) return JSON.parse(raw);
+    } catch (e) {
+      // ignore parse errors
+    }
+    // Start with empty notifications instead of mock data
+    return [];
+  });
+
+  // Persist notifications when they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('admin_notifications', JSON.stringify(notifications));
+    } catch (e) {
+      // ignore storage errors
+    }
+  }, [notifications]);
+
+  // Listen for course management events
+  useEffect(() => {
+    const handleCourseAdded = (e) => {
+      if (e.detail && e.detail.courseName) {
+        const newNotification = {
+          icon: "📚",
+          title: `New course added: ${e.detail.courseName}`,
+          date: new Date().toLocaleDateString(),
+          type: "course_added"
+        };
+        setNotifications(prev => [newNotification, ...prev]);
+      }
+    };
+
+    const handleCourseEdited = (e) => {
+      if (e.detail && e.detail.courseName) {
+        const newNotification = {
+          icon: "✏️",
+          title: `Course updated: ${e.detail.courseName}`,
+          date: new Date().toLocaleDateString(),
+          type: "course_edited"
+        };
+        setNotifications(prev => [newNotification, ...prev]);
+      }
+    };
+
+    const handleCourseDeleted = (e) => {
+      if (e.detail && e.detail.courseName) {
+        const newNotification = {
+          icon: "🗑️",
+          title: `Course deleted: ${e.detail.courseName}`,
+          date: new Date().toLocaleDateString(),
+          type: "course_deleted"
+        };
+        setNotifications(prev => [newNotification, ...prev]);
+      }
+    };
+
+    const handleStudentMessage = (e) => {
+      if (e.detail) {
+        const newNotification = {
+          icon: "�",
+          title: `New message from ${e.detail.studentName}: ${e.detail.subject}`,
+          date: new Date().toLocaleDateString(),
+          type: "student_message"
+        };
+        setNotifications(prev => [newNotification, ...prev]);
+      }
+    };
+
+    // Listen for custom events
+    window.addEventListener('courseAdded', handleCourseAdded);
+    window.addEventListener('courseEdited', handleCourseEdited);
+    window.addEventListener('courseDeleted', handleCourseDeleted);
+    window.addEventListener('studentMessage', handleStudentMessage);
+
+    return () => {
+      window.removeEventListener('courseAdded', handleCourseAdded);
+      window.removeEventListener('courseEdited', handleCourseEdited);
+      window.removeEventListener('courseDeleted', handleCourseDeleted);
+      window.removeEventListener('studentMessage', handleStudentMessage);
+    };
+  }, []);
 
   // Handle navigation to course details page
   const handleViewCourseDetails = (courseCode) => {
     navigate(`/course-details/${courseCode}`);
   };
-
-  // Mock data for recent activity
-  // const recentActivity = [
-  //   {
-  //     type: "course",
-  //     title: "New Course Added",
-  //     description:
-  //       "Introduction to Programming Course has been successfully added.",
-  //     timestamp: "Just now",
-  //   },
-  //   {
-  //     type: "student",
-  //     title: "Student Registered",
-  //     description: "John Doe has registered for Advanced Algorithms.",
-  //     timestamp: "2 hours ago",
-  //   },
-  //   {
-  //     type: "message",
-  //     title: "Message from Student",
-  //     description:
-  //       "Alice Smith has submitted a question regarding the course syllabus.",
-  //     timestamp: "1 day ago",
-  //   },
-  // ];
-
-  // Mock notifications data
-  const notifications = [
-    {
-      icon: "🔔",
-      title: "New student registration pending approval",
-      date: "October 15, 2023",
-    },
-    {
-      icon: "🔔",
-      title: "Course capacity reached for CS250",
-      date: "October 12, 2023",
-    },
-    {
-      icon: "🔔",
-      title: "System maintenance scheduled for this weekend",
-      date: "October 8, 2023",
-    },
-  ];
 
   return (
     <div className="flex flex-col gap-10">
@@ -212,8 +226,8 @@ export default function AdminDashboard() {
       {/* Term Selection */}
       <div>
         <h3 className="text-sm font-semibold mb-2">Select Term</h3>
-        <div className="flex gap-3">
-          {["Spring", "Summer", "Fall", "Winter"].map(
+        <div className="flex flex-wrap gap-3">
+          {["Fall", "Winter", "Spring", "Summer"].map(
             (term) => (
               <button
                 key={term}
@@ -249,21 +263,21 @@ export default function AdminDashboard() {
                 <tr className="text-xs font-medium">
                   <td className="p-3">Course Code</td>
                   <td className="p-3">Course Name</td>
-                  <td className="p-3">Start Date</td>
-                  <td className="p-3">End Date</td>
+                  <td className="p-3">Professor</td>
+                  <td className="p-3">Term</td>
                   <td className="p-3">Actions</td>
                 </tr>
               </thead>
               <tbody>
                 {termCourses.map((course, index) => (
                   <tr
-                    key={index}
+                    key={course.code || index}
                     className="text-xs border-b border-[var(--system-purple)] hover:bg-gray-50 cursor-pointer"
                   >
                     <td className="p-3 font-semibold">{course.code}</td>
                     <td className="p-3">{course.name}</td>
-                    <td className="p-3">{course.start}</td>
-                    <td className="p-3">{course.end}</td>
+                    <td className="p-3">{course.professor || 'TBD'}</td>
+                    <td className="p-3">{course.term}</td>
                     <td className="p-3">
                       <button
                         onClick={() => handleViewCourseDetails(course.code)}
@@ -289,24 +303,30 @@ export default function AdminDashboard() {
           </span>
         </div>
         <div className="border-[1px] border-[var(--system-purple)] rounded-md">
-          {notifications.map((notification, index) => (
-            <div
-              key={index}
-              className={`flex items-start gap-3 p-4 ${
-                index !== notifications.length - 1
-                  ? "border-b border-gray-200"
-                  : ""
-              }`}
-            >
-              <span className="text-xl">{notification.icon}</span>
-              <div className="flex-1">
-                <p className="text-sm font-medium">{notification.title}</p>
-                <p className="text-xs text-[var(--system-gray)] mt-1">
-                  {notification.date}
-                </p>
-              </div>
+          {notifications.length === 0 ? (
+            <div className="p-4 text-center text-gray-500 text-sm">
+              No notifications at this time.
             </div>
-          ))}
+          ) : (
+            notifications.map((notification, index) => (
+              <div
+                key={index}
+                className={`flex items-start gap-3 p-4 ${
+                  index !== notifications.length - 1
+                    ? "border-b border-gray-200"
+                    : ""
+                }`}
+              >
+                <span className="text-xl">{notification.icon}</span>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{notification.title}</p>
+                  <p className="text-xs text-[var(--system-gray)] mt-1">
+                    {notification.date}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

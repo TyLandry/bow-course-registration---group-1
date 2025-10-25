@@ -161,6 +161,7 @@ export default function CourseManagement() {
   // Delete a course with confirmation
   const handleDeleteCourse = (courseCode) => {
     if (window.confirm('Are you sure you want to delete this course?')) {
+      const courseToDelete = courses.find(course => course.code === courseCode);
       const updatedCourses = courses.filter(course => course.code !== courseCode);
       setCourses(updatedCourses);
       localStorage.setItem('courses', JSON.stringify(updatedCourses));
@@ -201,6 +202,49 @@ export default function CourseManagement() {
       key: 'courses',
       newValue: JSON.stringify(updatedCourses)
     }));
+    
+    // Dispatch admin notification event
+    if (editingCourse) {
+      // Add notification to admin_notifications in localStorage
+      try {
+        const existingNotifications = JSON.parse(localStorage.getItem('admin_notifications') || '[]');
+        const newNotification = {
+          icon: "✏️",
+          title: `Course updated: ${formData.name}`,
+          date: new Date().toLocaleDateString(),
+          type: "course_edited",
+          id: Date.now()
+        };
+        const updatedNotifications = [newNotification, ...existingNotifications];
+        localStorage.setItem('admin_notifications', JSON.stringify(updatedNotifications));
+      } catch (e) {
+        console.error('Error saving notification:', e);
+      }
+      
+      window.dispatchEvent(new CustomEvent('courseEdited', {
+        detail: { courseName: formData.name, courseCode: formData.code }
+      }));
+    } else {
+      // Add notification to admin_notifications in localStorage
+      try {
+        const existingNotifications = JSON.parse(localStorage.getItem('admin_notifications') || '[]');
+        const newNotification = {
+          icon: "📚",
+          title: `New course added: ${formData.name}`,
+          date: new Date().toLocaleDateString(),
+          type: "course_added",
+          id: Date.now()
+        };
+        const updatedNotifications = [newNotification, ...existingNotifications];
+        localStorage.setItem('admin_notifications', JSON.stringify(updatedNotifications));
+      } catch (e) {
+        console.error('Error saving notification:', e);
+      }
+      
+      window.dispatchEvent(new CustomEvent('courseAdded', {
+        detail: { courseName: formData.name, courseCode: formData.code }
+      }));
+    }
     
     setShowModal(false);
   };

@@ -5,12 +5,14 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const nav = useNavigate();
 
-  // Load use from the local storage if exists
+  // Load user from the local storage if exists
   useEffect(() => {
     const raw = localStorage.getItem("app_currentUser");
     if (raw) setCurrentUser(JSON.parse(raw));
+    setIsLoading(false); // Mark loading as complete
   }, []);
 
   const normalizeEmail = (e) => e.trim().toLowerCase();
@@ -99,7 +101,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ currentUser, signup, login, logout }}>
+    <AuthContext.Provider value={{ currentUser, isLoading, signup, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
