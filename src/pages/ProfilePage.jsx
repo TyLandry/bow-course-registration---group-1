@@ -2,7 +2,7 @@ import { useAuth } from "../auth/authentication";
 import { useState, useEffect } from "react";
 
 function ProfilePage() {
-  const { currentUser, setUser } = useAuth();
+  const { currentUser, setCurrentUser } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     id: "",
@@ -60,7 +60,7 @@ function ProfilePage() {
     localStorage.setItem("app_users", JSON.stringify(users));
     localStorage.setItem("app_currentUser", JSON.stringify(user));
     // refresh currentUser
-    setUser(user);
+    setCurrentUser(user);
 
     setShowModal(false);
   };

@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
     phone,
     birthday,
     program,
-    department
+    department,
   }) => {
     const users = JSON.parse(localStorage.getItem("app_users") || "[]");
     const e = normalizeEmail(email);
@@ -50,7 +50,7 @@ export function AuthProvider({ children }) {
       phone,
       birthday,
       program,
-      department
+      department,
     };
     users.push(user);
     localStorage.setItem("app_users", JSON.stringify(users));
@@ -111,13 +111,9 @@ export function AuthProvider({ children }) {
     nav("/login", { replace: true });
   };
 
-  const setUser = (user) => {
-    setCurrentUser(user);
-  };
-
   return (
     <AuthContext.Provider
-      value={{ currentUser, isLoading, signup, login, logout, setUser }}
+      value={{ currentUser, isLoading, signup, login, logout, setCurrentUser }}
     >
       {children}
     </AuthContext.Provider>
