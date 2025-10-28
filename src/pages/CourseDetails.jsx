@@ -156,8 +156,8 @@ export default function CourseDetails() {
               <p className="text-sm">{course.term}</p>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-[var(--system-gray)] mb-1">Professor</label>
-              <p className="text-sm">{course.professor}</p>
+              <label className="block text-sm font-semibold text-[var(--system-gray)] mb-1">Instructor</label>
+              <p className="text-sm">{course.instructor || 'TBD'}</p>
             </div>
             <div>
               <label className="block text-sm font-semibold text-[var(--system-gray)] mb-1">Department</label>

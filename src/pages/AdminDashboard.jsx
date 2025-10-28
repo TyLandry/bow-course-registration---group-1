@@ -259,7 +259,7 @@ export default function AdminDashboard() {
                 <tr className="text-xs font-medium">
                   <td className="p-3">Course Code</td>
                   <td className="p-3">Course Name</td>
-                  <td className="p-3">Professor</td>
+                  <td className="p-3">Instructor</td>
                   <td className="p-3">Term</td>
                   <td className="p-3">Actions</td>
                 </tr>
@@ -270,9 +270,9 @@ export default function AdminDashboard() {
                     key={course.code || index}
                     className="text-xs border-b border-[var(--system-purple)] hover:bg-gray-50 cursor-pointer"
                   >
-                    <td className="p-3 font-semibold">{course.code}</td>
+                    <td className="p-3">{course.code}</td>
                     <td className="p-3">{course.name}</td>
-                    <td className="p-3">{course.professor || 'TBD'}</td>
+                    <td className="p-3">{course.instructor || 'TBD'}</td>
                     <td className="p-3">{course.term}</td>
                     <td className="p-3">
                       <button
@@ -290,10 +290,10 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Notifications and Messages*/}
+      {/* Notifications */}
       <div className="max-w-2xl mx-auto w-full">
         <div className="flex items-center gap-2 mb-3">
-          <h2 className="text-lg font-bold">Notifications and Messages</h2>
+          <h2 className="text-lg font-bold">Notifications</h2>
           <span className="bg-[var(--system-blue)] text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">
             {notifications.length}
           </span>

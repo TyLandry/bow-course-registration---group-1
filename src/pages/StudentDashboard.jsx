@@ -36,10 +36,34 @@ export default function StudentDashboard() {
   // Load enrolled courses from localStorage and filter by selected term
   useEffect(() => {
     const savedCourses = localStorage.getItem('registeredCourses');
+    const allCourses = localStorage.getItem('courses'); // Get current course data
+    
     if (savedCourses) {
       const allRegisteredCourses = JSON.parse(savedCourses);
+      const currentCourses = allCourses ? JSON.parse(allCourses) : [];
+      
+      // Merge registered courses with current course information
+      const updatedRegisteredCourses = allRegisteredCourses.map(regCourse => {
+        // Find the current course data by code
+        const currentCourse = currentCourses.find(course => course.code === regCourse.code);
+        
+        if (currentCourse) {
+          // Merge registration info with current course data
+          return {
+            ...regCourse, // Keep registration-specific data (status, etc.)
+            name: currentCourse.name, // Use updated course name
+            instructor: currentCourse.instructor || regCourse.instructor, // Use updated instructor
+            term: currentCourse.term, // Use updated term
+            // Keep any other updated fields while preserving registration status
+          };
+        }
+        
+        // If course no longer exists in courses list, keep original registration data
+        return regCourse;
+      });
+      
       // Filter courses by selected term using partial matching
-      const coursesForTerm = allRegisteredCourses.filter(
+      const coursesForTerm = updatedRegisteredCourses.filter(
         course => course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
       );
       setEnrolledCourses(coursesForTerm);
@@ -52,16 +76,38 @@ export default function StudentDashboard() {
   // Listen for localStorage changes to update courses in real-time
   useEffect(() => {
     const handleStorageChange = () => {
-      console.log('Storage change detected in StudentDashboard');
       const savedCourses = localStorage.getItem('registeredCourses');
+      const allCourses = localStorage.getItem('courses'); // Get current course data
+      
       if (savedCourses) {
         const allRegisteredCourses = JSON.parse(savedCourses);
-        console.log('All registered courses:', allRegisteredCourses);
-        const coursesForTerm = allRegisteredCourses.filter(
+        const currentCourses = allCourses ? JSON.parse(allCourses) : [];
+        
+        // Merge registered courses with current course information
+        const updatedRegisteredCourses = allRegisteredCourses.map(regCourse => {
+          // Find the current course data by code
+          const currentCourse = currentCourses.find(course => course.code === regCourse.code);
+          
+          if (currentCourse) {
+            // Merge registration info with current course data
+            return {
+              ...regCourse, // Keep registration-specific data (status, etc.)
+              name: currentCourse.name, // Use updated course name
+              instructor: currentCourse.instructor || regCourse.instructor, 
+              term: currentCourse.term, // Use updated term
+            };
+          }
+          
+          // If course no longer exists in courses list, keep original registration data
+          return regCourse;
+        });
+        
+        const coursesForTerm = updatedRegisteredCourses.filter(
           course => course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
         );
-        console.log('Courses for term', selectedTerm, ':', coursesForTerm);
         setEnrolledCourses(coursesForTerm);
+      } else {
+        setEnrolledCourses([]);
       }
     };
 

@@ -28,7 +28,7 @@ export default function CourseManagement() {
     name: '',
     code: '',
     term: '',
-    professor: '',
+    instructor: '',
     start: '',
     end: '',
     desc: '',
@@ -60,7 +60,7 @@ export default function CourseManagement() {
         name: course.name || '',
         code: course.code || '',
         term: course.term || '',
-        professor: course.professor || '',
+        instructor: course.instructor || '',
         start: course.start || '',
         end: course.end || '',
         desc: course.desc || '',
@@ -76,11 +76,12 @@ export default function CourseManagement() {
   // Filter courses based on search term, term filter, and status filter
   useEffect(() => {
     let filtered = courses.filter(course => {
-      // Check if course matches search term
+      // Check if course matches search term (backward compatible with both instructor and professor fields)
       const matchesSearch = 
         course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         course.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        course.professor.toLowerCase().includes(searchTerm.toLowerCase());
+        (course.instructor && course.instructor.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (course.professor && course.professor.toLowerCase().includes(searchTerm.toLowerCase()));
       
       // Check if course matches term filter
       const matchesTerm = termFilter === 'All Terms/Semesters' || 
@@ -122,7 +123,7 @@ export default function CourseManagement() {
       name: '',
       code: '',
       term: '',
-      professor: '',
+      instructor: '',
       start: '',
       end: '',
       desc: '',
@@ -146,7 +147,7 @@ export default function CourseManagement() {
       name: course.name || '',
       code: course.code || '',
       term: course.term || '',
-      professor: course.professor || '',
+      instructor: course.instructor || '',
       start: course.start || '',
       end: course.end || '',
       desc: course.desc || '',
@@ -169,6 +170,11 @@ export default function CourseManagement() {
       window.dispatchEvent(new StorageEvent('storage', {
         key: 'courses',
         newValue: JSON.stringify(updatedCourses)
+      }));
+      
+      // Also dispatch custom event for same-tab updates
+      window.dispatchEvent(new CustomEvent('localStorageChange', {
+        detail: { key: 'courses', newValue: JSON.stringify(updatedCourses) }
       }));
     }
   };
@@ -200,6 +206,11 @@ export default function CourseManagement() {
     window.dispatchEvent(new StorageEvent('storage', {
       key: 'courses',
       newValue: JSON.stringify(updatedCourses)
+    }));
+    
+    // Also dispatch custom event for same-tab updates
+    window.dispatchEvent(new CustomEvent('localStorageChange', {
+      detail: { key: 'courses', newValue: JSON.stringify(updatedCourses) }
     }));
     
     // Dispatch admin notification event
@@ -281,7 +292,7 @@ export default function CourseManagement() {
         <div className="flex-1 w-full">
           <input
             type="text"
-            placeholder="Search by Course Name, Code, or Professor..."
+            placeholder="Search by Course Name, Code, or Instructor..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--system-blue)] focus:border-transparent"
@@ -324,7 +335,7 @@ export default function CourseManagement() {
                 <td className="p-3">Course Name</td>
                 <td className="p-3">Course Code</td>
                 <td className="p-3">Term</td>
-                <td className="p-3">Professor</td>
+                <td className="p-3">Instructor</td>
                 <td className="p-3">Start Date</td>
                 <td className="p-3">End Date</td>
                 <td className="p-3">Status</td>
@@ -337,7 +348,7 @@ export default function CourseManagement() {
                   <td className="p-3 font-semibold">{course.name}</td>
                   <td className="p-3">{course.code}</td>
                   <td className="p-3">{course.term}</td>
-                  <td className="p-3">{course.professor}</td>
+                  <td className="p-3">{course.instructor || 'TBD'}</td>
                   <td className="p-3">{course.start}</td>
                   <td className="p-3">{course.end}</td>
                   <td className="p-3">
@@ -443,7 +454,7 @@ export default function CourseManagement() {
                   </div>
                 </div>
                 
-                {/* Term and Professor */}
+                {/* Term and Instructor */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-semibold mb-1">
@@ -465,12 +476,12 @@ export default function CourseManagement() {
                   </div>
                   <div>
                     <label className="block text-sm font-semibold mb-1">
-                      Professor *
+                      Instructor *
                     </label>
                     <input
                       type="text"
-                      name="professor"
-                      value={formData.professor}
+                      name="instructor"
+                      value={formData.instructor}
                       onChange={handleInputChange}
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--system-blue)]"

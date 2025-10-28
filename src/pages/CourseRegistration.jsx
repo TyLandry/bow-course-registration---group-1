@@ -7,45 +7,15 @@ function CourseRegistration() {
   const [availableCourses, setAvailableCourses] = useState([]);
   const [allCourses, setAllCourses] = useState([]); // Store all courses from localStorage
 
-  // Load registered courses from localStorage or use default
+  // Load registered courses from localStorage 
   // this state persists across page reloads, so users don't lose their selections
-  // if no saved data, initialize with some default courses
-  // Note: These default courses should match the structure of the course data
   const [registeredCourses, setRegisteredCourses] = useState(() => {
     const saved = localStorage.getItem('registeredCourses');
     if (saved) {
       return JSON.parse(saved);
     }
-    return [
-      {
-        code: 'CS250',
-        name: 'Software Engineering',
-        instructor: 'Dr. Linus Torvalds',
-        term: 'Fall 2025',
-        status: 'In Progress',
-      },
-      {
-        code: 'CS260',
-        name: 'Frontend Frameworks',
-        instructor: 'Ms. Tracy Chou',
-        term: 'Fall 2025',
-        status: 'In Progress',
-      },
-      {
-        code: 'CS270',
-        name: 'Backend Development',
-        instructor: 'Mr. Brendan Eich',
-        term: 'Fall 2025',
-        status: 'In Progress',
-      },
-      {
-        code: 'CS280',
-        name: 'DevOps & Cloud',
-        instructor: 'Ms. Kelsey Hightower',
-        term: 'Fall 2025',
-        status: 'In Progress',
-      },
-    ];
+    // Start with empty array instead of mock data
+    return [];
   });
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -134,7 +104,7 @@ function CourseRegistration() {
     const newRegisteredCourse = {
       code: course.code,
       name: course.name,
-      instructor: course.professor || 'TBD', // Use professor field from admin-added courses
+      instructor: course.instructor || 'TBD',
       term: course.term,
       status: 'In Progress',
     };
@@ -243,8 +213,19 @@ function CourseRegistration() {
           <div className="flex items-center gap-3">
             <h2 className="font-semibold">Available Courses</h2>
           </div>
-          <div className="flex items-center gap-2">
-            {/* Search input removed as requested */}
+        </div>
+
+        {/* Search and Filter Controls */}
+        <div className="flex flex-col md:flex-row gap-4 items-center">
+          {/* Search Input */}
+          <div className="flex-1 w-full">
+            <input
+              type="text"
+              placeholder="Search by Course Name or Code..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--system-blue)] focus:border-transparent"
+            />
           </div>
         </div>
 
