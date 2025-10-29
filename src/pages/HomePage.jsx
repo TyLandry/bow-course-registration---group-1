@@ -3,10 +3,21 @@ import courses from "../temp_data/courses.json";
 import Program from "../components/Program";
 import Course from "../components/Course";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function HomePage() {
   const [programShow, setProgramShow] = useState(false);
   const [courseShow, setCourseShow] = useState(false);
+  const navigate = useNavigate();
+
+  const goToSignup = () => {
+    navigate("/signup");
+  };
+
+  const goToLogin = () => {
+    navigate("/login");
+  };
+
   return (
     <div className="flex flex-col gap-10">
       <div className="flex flex-col gap-2 items-center">
@@ -18,8 +29,8 @@ function HomePage() {
         </h3>
       </div>
       <div className="flex flex-row gap-2 justify-center">
-        <button className="btn-primary-fill py-1 px-3 text-sm">Sign Up</button>
-        <button className="btn-primary-outlined text-sm">
+        <button onClick={goToSignup} className="btn-primary-fill py-1 px-3 text-sm">Sign Up</button>
+        <button onClick={goToLogin} className="btn-primary-outlined text-sm">
           <p className="py-1 px-3">Login</p>
         </button>
       </div>
