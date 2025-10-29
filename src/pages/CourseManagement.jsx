@@ -128,7 +128,7 @@ export default function CourseManagement() {
       end: '',
       desc: '',
       status: 'Active',
-      department: 'Computer Science',
+      department: 'Software Development',
       credits: '3',
       prerequisites: 'None'
     });
@@ -152,7 +152,7 @@ export default function CourseManagement() {
       end: course.end || '',
       desc: course.desc || '',
       status: course.status || 'Active',
-      department: course.department || 'Computer Science',
+      department: course.department || 'Software Development',
       credits: course.credits || '3',
       prerequisites: course.prerequisites || 'None'
     });
@@ -161,10 +161,38 @@ export default function CourseManagement() {
 
   // Delete a course with confirmation
   const handleDeleteCourse = (courseCode) => {
-    if (window.confirm('Are you sure you want to delete this course?')) {
+    if (window.confirm('Are you sure you want to delete this course? This will also remove it from all student registrations.')) {
       const updatedCourses = courses.filter(course => course.code !== courseCode);
       setCourses(updatedCourses);
       localStorage.setItem('courses', JSON.stringify(updatedCourses));
+      
+      // Remove course from all students' registered courses
+      try {
+        const registeredCourses = JSON.parse(localStorage.getItem('registeredCourses') || '[]');
+        const updatedRegisteredCourses = registeredCourses.filter(course => 
+          course.code !== courseCode && course.courseCode !== courseCode
+        );
+        localStorage.setItem('registeredCourses', JSON.stringify(updatedRegisteredCourses));
+        console.log(`Removed course ${courseCode} from registered courses. Before: ${registeredCourses.length}, After: ${updatedRegisteredCourses.length}`);
+      } catch (e) {
+        console.error('Error updating registered courses:', e);
+      }
+      
+      // Remove course from course enrollments
+      try {
+        const courseEnrollments = JSON.parse(localStorage.getItem('courseEnrollments') || '[]');
+        const updatedEnrollments = courseEnrollments.filter(enrollment => 
+          enrollment.courseCode !== courseCode && enrollment.code !== courseCode
+        );
+        localStorage.setItem('courseEnrollments', JSON.stringify(updatedEnrollments));
+        console.log(`Removed course ${courseCode} from enrollments. Before: ${courseEnrollments.length}, After: ${updatedEnrollments.length}`);
+      } catch (e) {
+        console.error('Error updating course enrollments:', e);
+      }
+      
+      // Force reload of localStorage data for all listening components
+      const registeredCoursesData = localStorage.getItem('registeredCourses');
+      const enrollmentsData = localStorage.getItem('courseEnrollments');
       
       // Dispatch custom event for real-time updates
       window.dispatchEvent(new StorageEvent('storage', {
@@ -172,9 +200,33 @@ export default function CourseManagement() {
         newValue: JSON.stringify(updatedCourses)
       }));
       
+      // Dispatch events for registered courses and enrollments updates
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'registeredCourses',
+        newValue: registeredCoursesData
+      }));
+      
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'courseEnrollments',
+        newValue: enrollmentsData
+      }));
+      
       // Also dispatch custom event for same-tab updates
       window.dispatchEvent(new CustomEvent('localStorageChange', {
         detail: { key: 'courses', newValue: JSON.stringify(updatedCourses) }
+      }));
+      
+      window.dispatchEvent(new CustomEvent('localStorageChange', {
+        detail: { key: 'registeredCourses', newValue: registeredCoursesData }
+      }));
+      
+      window.dispatchEvent(new CustomEvent('localStorageChange', {
+        detail: { key: 'courseEnrollments', newValue: enrollmentsData }
+      }));
+      
+      // Force a page refresh for student dashboards by dispatching a special event
+      window.dispatchEvent(new CustomEvent('courseDeleted', {
+        detail: { courseCode, forceRefresh: true }
       }));
     }
   };

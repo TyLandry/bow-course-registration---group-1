@@ -123,29 +123,15 @@ export default function AdminDashboard() {
       }
     };
 
-    const handleStudentMessage = (e) => {
-      if (e.detail) {
-        const newNotification = {
-          icon: "�",
-          title: `New message from ${e.detail.studentName}: ${e.detail.subject}`,
-          date: new Date().toLocaleDateString(),
-          type: "student_message"
-        };
-        setNotifications(prev => [newNotification, ...prev]);
-      }
-    };
-
     // Listen for custom events
     window.addEventListener('courseAdded', handleCourseAdded);
     window.addEventListener('courseEdited', handleCourseEdited);
     window.addEventListener('courseDeleted', handleCourseDeleted);
-    window.addEventListener('studentMessage', handleStudentMessage);
 
     return () => {
       window.removeEventListener('courseAdded', handleCourseAdded);
       window.removeEventListener('courseEdited', handleCourseEdited);
       window.removeEventListener('courseDeleted', handleCourseDeleted);
-      window.removeEventListener('studentMessage', handleStudentMessage);
     };
   }, []);
 
@@ -267,7 +253,7 @@ export default function AdminDashboard() {
               <tbody>
                 {termCourses.map((course, index) => (
                   <tr
-                    key={course.code || index}
+                    key={course.id || course.code || `course-${index}`}
                     className="text-xs border-b border-[var(--system-purple)] hover:bg-gray-50 cursor-pointer"
                   >
                     <td className="p-3">{course.code}</td>
@@ -306,7 +292,7 @@ export default function AdminDashboard() {
           ) : (
             notifications.map((notification, index) => (
               <div
-                key={index}
+                key={notification.id || `notification-${index}`}
                 className={`flex items-start gap-3 p-4 ${
                   index !== notifications.length - 1
                     ? "border-b border-gray-200"

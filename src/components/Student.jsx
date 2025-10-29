@@ -9,15 +9,15 @@ export default function Student({
   program,
 }) {
   return (
-    <tr className="text-xs borer-[1px] border-[1px] border-[var(--system-purple)]">
-      <td className="font-semibold p-2">{id}</td>
-      <td className="font-semibold p-2">{firstName}</td>
-      <td className="p-2">{lastName}</td>
-      <td className="p-2">{email}</td>
-      <td className="p-2">{phone}</td>
-      <td className="p-2">{birthday}</td>
-      <td className="p-2">{department}</td>
-      <td className="p-2">{program}</td>
+    <tr className="text-xs lg:text-sm border-[1px] border-[var(--system-purple)]">
+      <td className="font-semibold p-2 lg:p-3 whitespace-nowrap">{id}</td>
+      <td className="font-semibold p-2 lg:p-3 whitespace-nowrap">{firstName}</td>
+      <td className="p-2 lg:p-3 whitespace-nowrap">{lastName}</td>
+      <td className="p-2 lg:p-3 whitespace-nowrap">{email}</td>
+      <td className="p-2 lg:p-3 whitespace-nowrap">{phone}</td>
+      <td className="p-2 lg:p-3 whitespace-nowrap">{birthday}</td>
+      <td className="p-2 lg:p-3 whitespace-nowrap">{department}</td>
+      <td className="p-2 lg:p-3 whitespace-nowrap">{program}</td>
     </tr>
   );
 }

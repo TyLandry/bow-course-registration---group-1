@@ -76,110 +76,124 @@ export default function StudentListPage() {
   }, [selectedProgram, searchValue, students]);
 
   return (
-    <div className="flex flex-col gap-10">
-      <div className="flex flex-col gap-2 items-center">
-        <h1 className="text-xl font-bold">View Students</h1>
-        <h3 className="text-xs">
+    <div className="flex flex-col gap-6 lg:gap-10 py-6 lg:py-10 px-4">
+      <div className="flex flex-col gap-2 items-center text-center">
+        <h1 className="text-2xl lg:text-3xl font-bold">View Students</h1>
+        <p className="text-gray-600 text-sm lg:text-base">
           Manage student registrations in the Software Development department.
-        </h3>
+        </p>
       </div>
-      <div>
-        <h2 className="font-semibold">Search Students</h2>
-        <input
-          type="text"
-          placeholder="Enter name or ID"
-          onChange={(e) => setSearchValue(e.target.value)}
-          className="border border-gray-400 rounded-md px-3 py-2 w-[500px] focus:outline-none focus:ring-2 focus:ring-blue-500 mt-4"
-        />
-      </div>
-      <div>
-        <h2 className="font-semibold">Filter by Program</h2>
-        <div className="flex gap-3 mt-4">
-          {["All Programs", "Diploma", "Post-Diploma", "Certificate"].map((program) => (
-            <button
-              key={program}
-              onClick={() => setSelectedProgram(program)}
-              className={`px-4 py-2 text-sm rounded-md ${
-                selectedProgram === program
-                  ? "bg-1 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
-            >
-              {program}
-            </button>
-          ))}
+      
+      {/* Search and Filter Section */}
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start lg:items-end">
+        <div className="w-full lg:flex-1">
+          <h2 className="font-semibold mb-2">Search Students</h2>
+          <input
+            type="text"
+            placeholder="Enter name or ID"
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="border border-gray-400 rounded-md px-3 py-2 w-full max-w-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        
+        <div className="w-full lg:w-auto">
+          <h2 className="font-semibold mb-2">Filter by Program</h2>
+          <div className="flex flex-wrap gap-2 lg:gap-3">
+            {["All Programs", "Diploma", "Post-Diploma", "Certificate"].map((program) => (
+              <button
+                key={program}
+                onClick={() => setSelectedProgram(program)}
+                className={`px-3 lg:px-4 py-2 text-xs lg:text-sm rounded-md transition-colors ${
+                  selectedProgram === program
+                    ? "bg-1 text-white"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                {program}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      <div>
-        <table className="min-w-full divide-y divide-gray-200 border-[1px] border-[var(--system-purple)] mt-2">
-          <thead className="bg-1 text-white">
-            <tr className="text-xs font-medium">
-              <td className="p-2">ID</td>
-              <td className="p-2">First Name</td>
-              <td className="p-2">Last Name</td>
-              <td className="p-2">Email</td>
-              <td className="p-2">Phone</td>
-              <td className="p-2">Birthday</td>
-              <td className="p-2">Department</td>
-              <td className="p-2">Program</td>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredStudent.length === 0 ? (
-              <tr>
-                <td colSpan="8" className="text-center py-8 text-[var(--system-gray)] text-sm">
-                  {students.length === 0 
-                    ? "No students found in the system." 
-                    : "No students found matching the current filter."}
-                </td>
+      {/* Table Section */}
+      <div className="w-full">
+        <div className="overflow-x-auto shadow-sm rounded-lg border border-gray-200">
+          <table className="min-w-full divide-y divide-gray-200 border-[1px] border-[var(--system-purple)]">
+            <thead className="bg-1 text-white">
+              <tr className="text-xs lg:text-sm font-medium">
+                <td className="p-2 lg:p-3 whitespace-nowrap">ID</td>
+                <td className="p-2 lg:p-3 whitespace-nowrap">First Name</td>
+                <td className="p-2 lg:p-3 whitespace-nowrap">Last Name</td>
+                <td className="p-2 lg:p-3 whitespace-nowrap">Email</td>
+                <td className="p-2 lg:p-3 whitespace-nowrap">Phone</td>
+                <td className="p-2 lg:p-3 whitespace-nowrap">Birthday</td>
+                <td className="p-2 lg:p-3 whitespace-nowrap">Department</td>
+                <td className="p-2 lg:p-3 whitespace-nowrap">Program</td>
               </tr>
-            ) : (
-              <>
-                {filteredStudent.slice(0, 4).map((s) => (
-                  <Student
-                    key={s.id}
-                    id={s.id}
-                    firstName={s.firstName}
-                    lastName={s.lastName}
-                    email={s.email}
-                    phone={s.phone}
-                    birthday={s.birthday}
-                    department={s.department}
-                    program={s.program}
-                  />
-                ))}
-                {studentShow &&
-                  filteredStudent
-                    .slice(4)
-                    .map((s) => (
-                      <Student
-                        key={s.id}
-                        id={s.id}
-                        firstName={s.firstName}
-                        lastName={s.lastName}
-                        email={s.email}
-                        phone={s.phone}
-                        birthday={s.birthday}
-                        department={s.department}
-                        program={s.program}
-                      />
-                    ))}
-              </>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredStudent.length === 0 ? (
+                <tr>
+                  <td colSpan="8" className="text-center py-8 text-[var(--system-gray)] text-xs lg:text-sm">
+                    {students.length === 0 
+                      ? "No students found in the system." 
+                      : "No students found matching the current filter."}
+                  </td>
+                </tr>
+              ) : (
+                <>
+                  {filteredStudent.slice(0, 4).map((s) => (
+                    <Student
+                      key={s.id}
+                      id={s.id}
+                      firstName={s.firstName}
+                      lastName={s.lastName}
+                      email={s.email}
+                      phone={s.phone}
+                      birthday={s.birthday}
+                      department={s.department}
+                      program={s.program}
+                    />
+                  ))}
+                  {studentShow &&
+                    filteredStudent
+                      .slice(4)
+                      .map((s) => (
+                        <Student
+                          key={s.id}
+                          id={s.id}
+                          firstName={s.firstName}
+                          lastName={s.lastName}
+                          email={s.email}
+                          phone={s.phone}
+                          birthday={s.birthday}
+                          department={s.department}
+                          program={s.program}
+                        />
+                      ))}
+                </>
+              )}
+            </tbody>
+          </table>
+        </div>
+        
+        {/* Scroll hint */}
+        <p className="text-xs text-gray-500 mt-2 text-center sm:hidden">
+          Scroll horizontally to see all columns
+        </p>
+        
         {filteredStudent.length > 4 && (
-          <button
-            className="btn-primary-outlined mt-5 mx-auto block"
-            onClick={() => setStudentShow(!studentShow)}
-          >
-            {studentShow ? (
-              <p className="py-2 px-3">View Less Students</p>
-            ) : (
-              <p className="py-2 px-3">View All Students</p>
-            )}
-          </button>
+          <div className="flex justify-center mt-5">
+            <button
+              className="btn-primary-outlined"
+              onClick={() => setStudentShow(!studentShow)}
+            >
+              <span className="py-2 px-3">
+                {studentShow ? "View Less Students" : "View All Students"}
+              </span>
+            </button>
+          </div>
         )}
       </div>
     </div>

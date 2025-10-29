@@ -36,34 +36,26 @@ export default function StudentDashboard() {
   // Load enrolled courses from localStorage and filter by selected term
   useEffect(() => {
     const savedCourses = localStorage.getItem('registeredCourses');
-    const allCourses = localStorage.getItem('courses'); // Get current course data
+    const availableCourses = localStorage.getItem('courses');
     
     if (savedCourses) {
       const allRegisteredCourses = JSON.parse(savedCourses);
-      const currentCourses = allCourses ? JSON.parse(allCourses) : [];
+      const currentCourses = availableCourses ? JSON.parse(availableCourses) : [];
+      const currentCourseCodes = currentCourses.map(course => course.code);
       
-      // Merge registered courses with current course information
-      const updatedRegisteredCourses = allRegisteredCourses.map(regCourse => {
-        // Find the current course data by code
-        const currentCourse = currentCourses.find(course => course.code === regCourse.code);
-        
-        if (currentCourse) {
-          // Merge registration info with current course data
-          return {
-            ...regCourse, // Keep registration-specific data (status, etc.)
-            name: currentCourse.name, // Use updated course name
-            instructor: currentCourse.instructor || regCourse.instructor, // Use updated instructor
-            term: currentCourse.term, // Use updated term
-            // Keep any other updated fields while preserving registration status
-          };
-        }
-        
-        // If course no longer exists in courses list, keep original registration data
-        return regCourse;
-      });
+      // Remove any registered courses that no longer exist in the course catalog
+      const validRegisteredCourses = allRegisteredCourses.filter(regCourse => 
+        currentCourseCodes.includes(regCourse.code)
+      );
+      
+      // If we found orphaned courses, update localStorage
+      if (validRegisteredCourses.length !== allRegisteredCourses.length) {
+        console.log(`Found ${allRegisteredCourses.length - validRegisteredCourses.length} orphaned courses, cleaning up...`);
+        localStorage.setItem('registeredCourses', JSON.stringify(validRegisteredCourses));
+      }
       
       // Filter courses by selected term using partial matching
-      const coursesForTerm = updatedRegisteredCourses.filter(
+      const coursesForTerm = validRegisteredCourses.filter(
         course => course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
       );
       setEnrolledCourses(coursesForTerm);
@@ -76,35 +68,31 @@ export default function StudentDashboard() {
   // Listen for localStorage changes to update courses in real-time
   useEffect(() => {
     const handleStorageChange = () => {
+      console.log('Storage change detected in StudentDashboard');
       const savedCourses = localStorage.getItem('registeredCourses');
-      const allCourses = localStorage.getItem('courses'); // Get current course data
+      const availableCourses = localStorage.getItem('courses');
       
       if (savedCourses) {
         const allRegisteredCourses = JSON.parse(savedCourses);
-        const currentCourses = allCourses ? JSON.parse(allCourses) : [];
+        const currentCourses = availableCourses ? JSON.parse(availableCourses) : [];
+        const currentCourseCodes = currentCourses.map(course => course.code);
         
-        // Merge registered courses with current course information
-        const updatedRegisteredCourses = allRegisteredCourses.map(regCourse => {
-          // Find the current course data by code
-          const currentCourse = currentCourses.find(course => course.code === regCourse.code);
-          
-          if (currentCourse) {
-            // Merge registration info with current course data
-            return {
-              ...regCourse, // Keep registration-specific data (status, etc.)
-              name: currentCourse.name, // Use updated course name
-              instructor: currentCourse.instructor || regCourse.instructor, 
-              term: currentCourse.term, // Use updated term
-            };
-          }
-          
-          // If course no longer exists in courses list, keep original registration data
-          return regCourse;
-        });
+        // Remove any registered courses that no longer exist in the course catalog
+        const validRegisteredCourses = allRegisteredCourses.filter(regCourse => 
+          currentCourseCodes.includes(regCourse.code)
+        );
         
-        const coursesForTerm = updatedRegisteredCourses.filter(
+        // If we found orphaned courses, update localStorage
+        if (validRegisteredCourses.length !== allRegisteredCourses.length) {
+          console.log(`Storage change cleanup: Found ${allRegisteredCourses.length - validRegisteredCourses.length} orphaned courses, cleaning up...`);
+          localStorage.setItem('registeredCourses', JSON.stringify(validRegisteredCourses));
+        }
+        
+        console.log('All registered courses after cleanup:', validRegisteredCourses);
+        const coursesForTerm = validRegisteredCourses.filter(
           course => course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
         );
+        console.log('Courses for term', selectedTerm, ':', coursesForTerm);
         setEnrolledCourses(coursesForTerm);
       } else {
         setEnrolledCourses([]);
@@ -214,7 +202,7 @@ export default function StudentDashboard() {
               <tbody>
                 {enrolledCourses.map((course, index) => (
                   <tr
-                    key={index}
+                    key={course.id || course.code || `course-${index}`}
                     className="text-xs border-b border-[var(--system-purple)]"
                   >
                     <td className="p-3 font-semibold">{course.code}</td>
@@ -268,7 +256,7 @@ export default function StudentDashboard() {
           ) : (
             notifications.map((notification, index) => (
               <div
-                key={index}
+                key={notification.id || `notification-${index}`}
                 className={`flex items-start gap-3 p-4 ${
                   index !== notifications.length - 1
                     ? "border-b border-gray-200"

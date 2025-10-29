@@ -264,7 +264,7 @@ export default function CourseDetails() {
               </thead>
               <tbody>
                 {enrolledStudents.map((student, index) => (
-                  <tr key={student.studentId || index} className="text-xs border-b border-[var(--system-purple)]">
+                  <tr key={student.Id ||student.studentId || `student-${index}`} className="text-xs border-b border-[var(--system-purple)]">
                     <td className="p-3 font-semibold">{student.studentName}</td>
                     <td className="p-3">{student.studentId}</td>
                     <td className="p-3">{student.email}</td>
