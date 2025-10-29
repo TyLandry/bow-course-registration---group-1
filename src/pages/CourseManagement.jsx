@@ -173,9 +173,8 @@ export default function CourseManagement() {
           course.code !== courseCode && course.courseCode !== courseCode
         );
         localStorage.setItem('registeredCourses', JSON.stringify(updatedRegisteredCourses));
-        console.log(`Removed course ${courseCode} from registered courses. Before: ${registeredCourses.length}, After: ${updatedRegisteredCourses.length}`);
       } catch (e) {
-        console.error('Error updating registered courses:', e);
+        // Silently handle errors
       }
       
       // Remove course from course enrollments
@@ -185,9 +184,8 @@ export default function CourseManagement() {
           enrollment.courseCode !== courseCode && enrollment.code !== courseCode
         );
         localStorage.setItem('courseEnrollments', JSON.stringify(updatedEnrollments));
-        console.log(`Removed course ${courseCode} from enrollments. Before: ${courseEnrollments.length}, After: ${updatedEnrollments.length}`);
       } catch (e) {
-        console.error('Error updating course enrollments:', e);
+        // Silently handle errors
       }
       
       // Force reload of localStorage data for all listening components
@@ -239,8 +237,62 @@ export default function CourseManagement() {
     
     // Update existing course or add new course
     if (editingCourse) {
+      // FIRST: Update student registered courses with new course information
+      try {
+        const registeredCourses = JSON.parse(localStorage.getItem('registeredCourses') || '[]');
+        const updatedRegisteredCourses = registeredCourses.map(regCourse => {
+          if (regCourse.code === editingCourse.code || regCourse.courseCode === editingCourse.code) {
+            // Update the registered course with new information while preserving registration-specific data
+            return {
+              ...regCourse, // Keep registration status
+              name: formData.name, // Update course name
+              code: formData.code, // Update course code
+              courseCode: formData.code, // Update courseCode field
+              instructor: formData.instructor, // Update instructor
+              term: formData.term, // Update term
+              start: formData.start, // Update start date
+              end: formData.end, // Update end date
+              desc: formData.desc, // Update description
+              status: formData.status, // Update status
+              department: formData.department, // Update department
+              credits: formData.credits, // Update credits
+              prerequisites: formData.prerequisites // Update prerequisites
+            };
+          }
+          return regCourse;
+        });
+        localStorage.setItem('registeredCourses', JSON.stringify(updatedRegisteredCourses));
+      } catch (e) {
+        console.error('Error updating registered courses:', e);
+      }
+      
+      // SECOND: Update course enrollments with new course information
+      try {
+        const courseEnrollments = JSON.parse(localStorage.getItem('courseEnrollments') || '[]');
+        const updatedEnrollments = courseEnrollments.map(enrollment => {
+          if (enrollment.courseCode === editingCourse.code || enrollment.code === editingCourse.code) {
+            return {
+              ...enrollment,
+              courseName: formData.name, // Update course name in enrollments
+              courseCode: formData.code, // Update course code
+              code: formData.code, // Update code field if it exists
+              term: formData.term, // Update term
+              instructor: formData.instructor, // Update instructor
+            };
+          }
+          return enrollment;
+        });
+        localStorage.setItem('courseEnrollments', JSON.stringify(updatedEnrollments));
+      } catch (e) {
+        // Silently handle errors
+      }
+      
+      // THIRD: Update the main courses catalog
       updatedCourses = courses.map(course =>
-        course.code === editingCourse.code ? { ...formData } : course
+        course.code === editingCourse.code ? { 
+          ...course, // Preserve original course properties (like id)
+          ...formData // Override with new form data
+        } : course
       );
     } else {
       const newCourse = {
@@ -260,10 +312,34 @@ export default function CourseManagement() {
       newValue: JSON.stringify(updatedCourses)
     }));
     
+    // Dispatch events for updated registered courses and enrollments if this was an edit
+    if (editingCourse) {
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'registeredCourses',
+        newValue: localStorage.getItem('registeredCourses')
+      }));
+      
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'courseEnrollments',
+        newValue: localStorage.getItem('courseEnrollments')
+      }));
+    }
+    
     // Also dispatch custom event for same-tab updates
     window.dispatchEvent(new CustomEvent('localStorageChange', {
       detail: { key: 'courses', newValue: JSON.stringify(updatedCourses) }
     }));
+    
+    // Dispatch custom events for registered courses and enrollments if this was an edit
+    if (editingCourse) {
+      window.dispatchEvent(new CustomEvent('localStorageChange', {
+        detail: { key: 'registeredCourses', newValue: localStorage.getItem('registeredCourses') }
+      }));
+      
+      window.dispatchEvent(new CustomEvent('localStorageChange', {
+        detail: { key: 'courseEnrollments', newValue: localStorage.getItem('courseEnrollments') }
+      }));
+    }
     
     // Dispatch admin notification event
     if (editingCourse) {
@@ -280,7 +356,7 @@ export default function CourseManagement() {
         const updatedNotifications = [newNotification, ...existingNotifications];
         localStorage.setItem('admin_notifications', JSON.stringify(updatedNotifications));
       } catch (e) {
-        console.error('Error saving notification:', e);
+        // Silently handle errors
       }
       
       window.dispatchEvent(new CustomEvent('courseEdited', {
@@ -300,7 +376,7 @@ export default function CourseManagement() {
         const updatedNotifications = [newNotification, ...existingNotifications];
         localStorage.setItem('admin_notifications', JSON.stringify(updatedNotifications));
       } catch (e) {
-        console.error('Error saving notification:', e);
+        // Silently handle errors
       }
       
       window.dispatchEvent(new CustomEvent('courseAdded', {

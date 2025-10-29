@@ -12,7 +12,6 @@ export default function StudentListPage() {
   useEffect(() => {
     try {
       const allUsers = JSON.parse(localStorage.getItem("app_users") || "[]");
-      console.log("All users from localStorage:", allUsers);
       
       // Filter only student users
       const studentUsers = allUsers
@@ -22,19 +21,13 @@ export default function StudentListPage() {
           department: "Software Development", // Add default department since it's expected by Student component
         }));
       
-      console.log("Filtered student users:", studentUsers);
       setStudents(studentUsers);
     } catch (error) {
-      console.error("Error loading students:", error);
       setStudents([]);
     }
   }, []);
 
   useEffect(() => {
-    console.log("Students state:", students);
-    console.log("Selected program:", selectedProgram);
-    console.log("Search value:", searchValue);
-    
     if (students.length === 0) {
       setFilteredStudent([]);
       return;
@@ -55,8 +48,6 @@ export default function StudentListPage() {
       });
     }
     
-    console.log("After program filter:", result);
-    
     // Filter by search term with null safety
     const finalResult = result.filter(
       (r) => {
@@ -71,7 +62,6 @@ export default function StudentListPage() {
       }
     );
     
-    console.log("Final filtered result:", finalResult);
     setFilteredStudent(finalResult);
   }, [selectedProgram, searchValue, students]);
 

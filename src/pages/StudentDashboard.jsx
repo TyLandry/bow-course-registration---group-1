@@ -36,31 +36,13 @@ export default function StudentDashboard() {
   // Load enrolled courses from localStorage and filter by selected term
   useEffect(() => {
     const savedCourses = localStorage.getItem('registeredCourses');
-    const availableCourses = localStorage.getItem('courses');
     
     if (savedCourses) {
       const allRegisteredCourses = JSON.parse(savedCourses);
-      const currentCourses = availableCourses ? JSON.parse(availableCourses) : [];
-      const catalogByCode = currentCourses.reduce((acc, c) => {
-        acc[c.code] = c;
-        return acc;
-      }, {});
-      const validRegisteredCourses = allRegisteredCourses.filter(regCourse => 
-        !!catalogByCode[regCourse.code]
-      );
       
-      // If we found orphaned courses, update localStorage
-      if (validRegisteredCourses.length !== allRegisteredCourses.length) {
-        console.log(`Found ${allRegisteredCourses.length - validRegisteredCourses.length} orphaned courses, cleaning up...`);
-        localStorage.setItem('registeredCourses', JSON.stringify(validRegisteredCourses));
-      }
-      
-      // Filter courses by selected term using partial matching
-      const merged = validRegisteredCourses.map(reg => ({
-        ...reg,
-        ...(catalogByCode[reg.code] || {})
-      }));
-      const coursesForTerm = merged.filter(
+      // REMOVED ORPHAN CLEANUP - Let CourseManagement handle deletions
+      // Just display registered courses directly
+      const coursesForTerm = allRegisteredCourses.filter(
         course => course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
       );
       setEnrolledCourses(coursesForTerm);
@@ -72,39 +54,18 @@ export default function StudentDashboard() {
 
   // Listen for localStorage changes to update courses in real-time
   useEffect(() => {
-    const handleStorageChange = () => {
-      console.log('Storage change detected in StudentDashboard');
+    const handleStorageChange = (e) => {
       const savedCourses = localStorage.getItem('registeredCourses');
       const availableCourses = localStorage.getItem('courses');
       
       if (savedCourses) {
         const allRegisteredCourses = JSON.parse(savedCourses);
-        const currentCourses = availableCourses ? JSON.parse(availableCourses) : [];
-        const catalogByCode = currentCourses.reduce((acc, c) => {
-          acc[c.code] = c;
-          return acc;
-        }, {});
         
-        // Remove any registered courses that no longer exist in the course catalog
-        const validRegisteredCourses = allRegisteredCourses.filter(regCourse => 
-          !!catalogByCode[regCourse.code]
-        );
-        
-        // If we found orphaned courses, update localStorage
-        if (validRegisteredCourses.length !== allRegisteredCourses.length) {
-          console.log(`Storage change cleanup: Found ${allRegisteredCourses.length - validRegisteredCourses.length} orphaned courses, cleaning up...`);
-          localStorage.setItem('registeredCourses', JSON.stringify(validRegisteredCourses));
-        }
-        
-        console.log('All registered courses after cleanup:', validRegisteredCourses);
-        const merged = validRegisteredCourses.map(reg => ({
-          ...reg,
-          ...(catalogByCode[reg.code] || {})
-        }));
-        const coursesForTerm = merged.filter(
+        // REMOVED ORPHAN CLEANUP - It was too aggressive during course edits
+        // Just display what's in registered courses without validation
+        const coursesForTerm = allRegisteredCourses.filter(
           course => course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
         );
-        console.log('Courses for term', selectedTerm, ':', coursesForTerm);
         setEnrolledCourses(coursesForTerm);
       } else {
         setEnrolledCourses([]);

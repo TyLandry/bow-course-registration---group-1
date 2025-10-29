@@ -50,7 +50,7 @@ export default function AdminDashboard() {
           setNotifications(JSON.parse(savedNotifications));
         }
       } catch (e) {
-        console.error('Error loading notifications:', e);
+        // Silently handle errors
       }
     };
 

@@ -57,19 +57,33 @@ function CourseRegistration() {
     };
   }, []);
 
-  // Keep registeredCourses in sync with current active catalog (drop courses no longer active/existing)
+  // Listen for updates to registered courses from other components (like CourseManagement)
   useEffect(() => {
-    if (!registeredCourses.length) return;
-    const activeCodes = new Set(allCourses.map(c => c.code));
-    const valid = registeredCourses.filter(rc => activeCodes.has(rc.code));
-    if (valid.length !== registeredCourses.length) {
-      setRegisteredCourses(valid);
-      localStorage.setItem('registeredCourses', JSON.stringify(valid));
-      window.dispatchEvent(new CustomEvent('localStorageChange', {
-        detail: { key: 'registeredCourses', newValue: JSON.stringify(valid) }
-      }));
-    }
-  }, [allCourses]); // eslint-disable-line react-hooks/exhaustive-deps
+    const handleRegisteredCoursesChange = (e) => {
+      // Only update if the event is from external source (not our own saves)
+      if (e.type === 'storage' || (e.detail && e.detail.key === 'registeredCourses')) {
+        const savedRegistered = localStorage.getItem('registeredCourses');
+        if (savedRegistered) {
+          const parsed = JSON.parse(savedRegistered);
+          // Only update if data is different to avoid infinite loop
+          setRegisteredCourses(prev => {
+            if (JSON.stringify(prev) !== savedRegistered) {
+              return parsed;
+            }
+            return prev;
+          });
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleRegisteredCoursesChange);
+    window.addEventListener('localStorageChange', handleRegisteredCoursesChange);
+
+    return () => {
+      window.removeEventListener('storage', handleRegisteredCoursesChange);
+      window.removeEventListener('localStorageChange', handleRegisteredCoursesChange);
+    };
+  }, []);
 
   // Filter courses based on selected term
   // This updates whenever the term changes or new courses are added by admin
@@ -91,13 +105,12 @@ function CourseRegistration() {
 
   // Save registered courses to localStorage whenever they change
   useEffect(() => {
-    console.log('Saving to localStorage:', registeredCourses);
     localStorage.setItem(
       'registeredCourses',
       JSON.stringify(registeredCourses)
     );
-    // Dispatch custom event to notify other components of localStorage change
-    window.dispatchEvent(new Event('localStorageChange'));
+
+    // Other components listen to direct localStorage changes
   }, [registeredCourses]);
 
   // Filter available courses by search term
