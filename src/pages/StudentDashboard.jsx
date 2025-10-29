@@ -41,11 +41,12 @@ export default function StudentDashboard() {
     if (savedCourses) {
       const allRegisteredCourses = JSON.parse(savedCourses);
       const currentCourses = availableCourses ? JSON.parse(availableCourses) : [];
-      const currentCourseCodes = currentCourses.map(course => course.code);
-      
-      // Remove any registered courses that no longer exist in the course catalog
+      const catalogByCode = currentCourses.reduce((acc, c) => {
+        acc[c.code] = c;
+        return acc;
+      }, {});
       const validRegisteredCourses = allRegisteredCourses.filter(regCourse => 
-        currentCourseCodes.includes(regCourse.code)
+        !!catalogByCode[regCourse.code]
       );
       
       // If we found orphaned courses, update localStorage
@@ -55,7 +56,11 @@ export default function StudentDashboard() {
       }
       
       // Filter courses by selected term using partial matching
-      const coursesForTerm = validRegisteredCourses.filter(
+      const merged = validRegisteredCourses.map(reg => ({
+        ...reg,
+        ...(catalogByCode[reg.code] || {})
+      }));
+      const coursesForTerm = merged.filter(
         course => course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
       );
       setEnrolledCourses(coursesForTerm);
@@ -75,11 +80,14 @@ export default function StudentDashboard() {
       if (savedCourses) {
         const allRegisteredCourses = JSON.parse(savedCourses);
         const currentCourses = availableCourses ? JSON.parse(availableCourses) : [];
-        const currentCourseCodes = currentCourses.map(course => course.code);
+        const catalogByCode = currentCourses.reduce((acc, c) => {
+          acc[c.code] = c;
+          return acc;
+        }, {});
         
         // Remove any registered courses that no longer exist in the course catalog
         const validRegisteredCourses = allRegisteredCourses.filter(regCourse => 
-          currentCourseCodes.includes(regCourse.code)
+          !!catalogByCode[regCourse.code]
         );
         
         // If we found orphaned courses, update localStorage
@@ -89,7 +97,11 @@ export default function StudentDashboard() {
         }
         
         console.log('All registered courses after cleanup:', validRegisteredCourses);
-        const coursesForTerm = validRegisteredCourses.filter(
+        const merged = validRegisteredCourses.map(reg => ({
+          ...reg,
+          ...(catalogByCode[reg.code] || {})
+        }));
+        const coursesForTerm = merged.filter(
           course => course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
         );
         console.log('Courses for term', selectedTerm, ':', coursesForTerm);

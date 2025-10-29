@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 function CourseRegistration() {
@@ -57,6 +57,20 @@ function CourseRegistration() {
     };
   }, []);
 
+  // Keep registeredCourses in sync with current active catalog (drop courses no longer active/existing)
+  useEffect(() => {
+    if (!registeredCourses.length) return;
+    const activeCodes = new Set(allCourses.map(c => c.code));
+    const valid = registeredCourses.filter(rc => activeCodes.has(rc.code));
+    if (valid.length !== registeredCourses.length) {
+      setRegisteredCourses(valid);
+      localStorage.setItem('registeredCourses', JSON.stringify(valid));
+      window.dispatchEvent(new CustomEvent('localStorageChange', {
+        detail: { key: 'registeredCourses', newValue: JSON.stringify(valid) }
+      }));
+    }
+  }, [allCourses]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Filter courses based on selected term
   // This updates whenever the term changes or new courses are added by admin
   useEffect(() => {
@@ -92,6 +106,21 @@ function CourseRegistration() {
       course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       course.code.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Merge registered courses with latest catalog details for display
+  const catalogByCode = useMemo(() => {
+    return allCourses.reduce((acc, c) => {
+      acc[c.code] = c;
+      return acc;
+    }, {});
+  }, [allCourses]);
+
+  const displayedRegisteredCourses = useMemo(() => {
+    return registeredCourses.map(reg => ({
+      ...reg,
+      ...(catalogByCode[reg.code] || {})
+    }));
+  }, [registeredCourses, catalogByCode]);
 
   // Add course to registered courses
   const addCourse = (course) => {
@@ -276,7 +305,7 @@ function CourseRegistration() {
             Current Courses
           </h3>
 
-          {registeredCourses.length === 0 ? (
+          {displayedRegisteredCourses.length === 0 ? (
             <p className="text-gray-500 text-center py-8">
               No courses registered for this term.
             </p>
@@ -293,7 +322,7 @@ function CourseRegistration() {
                 </tr>
               </thead>
               <tbody>
-                {registeredCourses.map((course) => (
+                {displayedRegisteredCourses.map((course) => (
                   <tr key={course.code} className="text-xs border-b border-[var(--system-purple)]">
                     <td className="p-3">{course.code}</td>
                     <td className="p-3">{course.name}</td>
