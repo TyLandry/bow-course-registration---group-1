@@ -45,3 +45,9 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+ //React dev origin
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));

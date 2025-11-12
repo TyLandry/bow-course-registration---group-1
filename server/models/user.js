@@ -28,6 +28,14 @@ const userSchema = new mongoose.Schema({
         // enum: SignUpPage.map((department) => department.department),
         required: true,
     },
+    program: {
+        type: String,
+        required: true,
+    },
+    country: {
+        type: String,
+        required: true,
+    },
     password: {
     type: String,
     required: true,

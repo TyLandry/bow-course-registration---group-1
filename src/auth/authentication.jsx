@@ -8,15 +8,16 @@ export function AuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const nav = useNavigate();
 
-  // Load user from the local storage if exists
+  //Load user from the local storage if exists
   useEffect(() => {
     const raw = localStorage.getItem("app_currentUser");
     if (raw) setCurrentUser(JSON.parse(raw));
-    setIsLoading(false); // Mark loading as complete
+    setIsLoading(false); //Mark loading as complete
   }, []);
 
   const normalizeEmail = (e) => e.trim().toLowerCase();
 
+  /*Local torage signup/login methods (REPLACED WITH BACKEND CALLS)
   const signup = ({
     email,
     password,
@@ -61,7 +62,53 @@ export function AuthProvider({ children }) {
 
     nav("/login", { replace: true });
   };
+  -------------------------------------------------------------------- */
 
+  //Signup method calling backend API
+  const signup = async ({
+    email,
+    password,
+    role, //ignored by server; role is enforced server-side
+    firstName,
+    lastName,
+    phone,
+    birthday,
+    program,
+    department,
+    country,
+  }) => {
+    const payload = {
+      email: normalizeEmail(email),
+      password,
+      firstName,
+      lastName,
+      phone,
+      birthday,
+      program,
+      department,
+      country,
+    };
+
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data?.message || "Signup failed.");
+    }
+
+    // Server sets cookie; you can store lightweight user data for UI
+    localStorage.setItem("app_currentUser", JSON.stringify(data));
+    setCurrentUser(data);
+
+    nav("/login", { replace: true });
+  };
+
+  /*Local storage login method (REPLACED WITH BACKEND CALLS)
   const login = (email, password) => {
     const users = JSON.parse(localStorage.getItem("app_users") || "[]");
     const e = normalizeEmail(email);
@@ -77,11 +124,38 @@ export function AuthProvider({ children }) {
     );
     return true;
   };
+*/
 
+  //Login method calling backend API
+  const login = async (email, password) => {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email: normalizeEmail(email), password }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data?.message || "Invalid credentials");
+    }
+
+    //store what the backend returns for quick routing/UI
+    localStorage.setItem("app_currentUser", JSON.stringify(data));
+    setCurrentUser(data);
+
+    const role = data.role ?? "student";
+    nav(role === "student" ? "/student-dashboard" : "/admin-dashboard", {
+      replace: true,
+    });
+    return true;
+  };
+
+  //hardcode an admin user on first load for testing
   useEffect(() => {
     const users = JSON.parse(localStorage.getItem("app_users") || "[]");
 
-    // Add dummy admin only if no admin exists
+    //Add dummy admin only if no admin exists
     if (!users.some((u) => u.role === "admin")) {
       const adminDummy = [
         {
@@ -105,7 +179,15 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch {
+      //ignore network errors on logout
+    }
     localStorage.removeItem("app_currentUser");
     setCurrentUser(null);
     nav("/login", { replace: true });

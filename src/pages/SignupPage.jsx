@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../auth/authentication";
+import { useNavigate } from "react-router-dom";
 
 function SignUpPage() {
   const countryOptions = ["USA", "Canada", "UK", "Australia"];
@@ -12,6 +13,7 @@ function SignUpPage() {
   const [selectedCountry, setSelectedCountry] = useState("Canada");
 
   const { signup } = useAuth();
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     firstName: "",
@@ -20,12 +22,15 @@ function SignUpPage() {
     phone: "",
     birthday: "",
     program: "",
+    department: "",
+    country: selectedCountry,
     password: "",
     // Might have to create a way to select role later for admin
     role: "student",
   });
 
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const onChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -44,11 +49,15 @@ function SignUpPage() {
         lastName: form.lastName,
         phone: form.phone,
         birthday: form.birthday,
+        country: selectedCountry,
         program: form.program,
         department: form.department,
       });
+      navigate("/login");
     } catch (err) {
       setError(err.message || "Sign up failed.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
