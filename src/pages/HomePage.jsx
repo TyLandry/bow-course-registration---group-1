@@ -1,13 +1,40 @@
-import programs from "../temp_data/programs.json";
 import courses from "../temp_data/courses.json";
 import Program from "../components/Program";
 import Course from "../components/Course";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function HomePage() {
   const [programShow, setProgramShow] = useState(false);
   const [courseShow, setCourseShow] = useState(false);
+  const [programs, setPrograms] = useState([
+    {
+      name: "loading",
+      id: "loading",
+      term: "loading",
+      start: "loading",
+      end: "loading",
+      fees: "loading",
+      desc: "loading",
+    },
+  ]);
+
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      try {
+        const response = await fetch("/api/programs");
+        if (!response.ok) {
+          throw new Error("Failed to fetch programs");
+        }
+        const data = await response.json();
+        setPrograms(data);
+      } catch (err) {
+        console.log(err.message);
+      }
+    };
+    fetchPrograms();
+  }, []);
+
   const navigate = useNavigate();
 
   const goToSignup = () => {
@@ -29,7 +56,12 @@ function HomePage() {
         </h3>
       </div>
       <div className="flex flex-row gap-2 justify-center">
-        <button onClick={goToSignup} className="btn-primary-fill py-1 px-3 text-sm">Sign Up</button>
+        <button
+          onClick={goToSignup}
+          className="btn-primary-fill py-1 px-3 text-sm"
+        >
+          Sign Up
+        </button>
         <button onClick={goToLogin} className="btn-primary-outlined text-sm">
           <p className="py-1 px-3">Login</p>
         </button>
