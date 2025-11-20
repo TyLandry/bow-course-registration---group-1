@@ -34,7 +34,7 @@ router.post(
     const errors = validationResult(req);
     if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
-    let { firstName, lastName, email, phone, birthday, department, program, country, password } = req.body;
+    let { firstName, lastName, email, phone, birthday, department, program, country, password, role } = req.body;
     email = email.toLowerCase();
 
     try {
@@ -53,6 +53,7 @@ router.post(
         program,
         country,
         password: hashed, //store hashed password
+        role,
       });
 
       const token = generateToken(user);
@@ -67,7 +68,8 @@ router.post(
         birthday: user.birthday,
         department: user.department,
         program: user.program,
-        country: user.country
+        country: user.country,
+        role: user.role 
       });
     } catch (err) {
       console.error(err);
@@ -106,7 +108,7 @@ router.post(
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        role: user.role ?? "student" 
+        role: user.role ?? "student"
       });
     } catch (err) {
       console.error(err);
