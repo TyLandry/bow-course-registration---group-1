@@ -1,4 +1,3 @@
-import courses from "../temp_data/courses.json";
 import Program from "../components/Program";
 import Course from "../components/Course";
 import { useEffect, useState } from "react";
@@ -18,6 +17,16 @@ function HomePage() {
       desc: "loading",
     },
   ]);
+  const [featuredCourses, setFeaturedCourses] = useState([
+    {
+      name: "loading",
+      code: "loading",
+      term: "loading",
+      start: "loading",
+      end: "loading",
+      desc: "loading",
+    },
+  ]);
 
   useEffect(() => {
     const fetchPrograms = async () => {
@@ -27,12 +36,39 @@ function HomePage() {
           throw new Error("Failed to fetch programs");
         }
         const data = await response.json();
+        // Set the first 6 courses as featured courses
         setPrograms(data);
       } catch (err) {
         console.log(err.message);
       }
     };
     fetchPrograms();
+
+    const fetchCourses = async () => {
+      try {
+        const response = await fetch("/api/courses");
+        if (!response.ok) {
+          throw new Error("Failed to fetch courses");
+        }
+        const data = await response.json();
+
+        // Shuffle course data set
+        for (let i = data.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [data[i], data[j]] = [data[j], data[i]]; // Swap elements
+        }
+
+        // Set the first 6 courses as featured courses
+        if (data.length < 6) {
+          setFeaturedCourses(data);
+        } else {
+          setFeaturedCourses(data.slice(0, 6));
+        }
+      } catch (err) {
+        console.log(err.message);
+      }
+    };
+    fetchCourses();
   }, []);
 
   const navigate = useNavigate();
@@ -124,7 +160,7 @@ function HomePage() {
               </tr>
             </thead>
             <tbody>
-              {courses.slice(0, 4).map((p) => (
+              {featuredCourses.slice(0, 3).map((p) => (
                 <Course
                   key={p.code}
                   name={p.name}
@@ -136,8 +172,8 @@ function HomePage() {
                 />
               ))}
               {courseShow &&
-                courses
-                  .slice(4)
+                featuredCourses
+                  .slice(3)
                   .map((p) => (
                     <Course
                       key={p.code}
@@ -152,7 +188,7 @@ function HomePage() {
             </tbody>
           </table>
         </div>
-        {courses.length > 4 && (
+        {featuredCourses.length > 3 && (
           <button
             className="btn-primary-outlined mt-5 mx-auto block"
             onClick={() => setCourseShow(!courseShow)}
