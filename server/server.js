@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import authpaths from "./routes/auth.js";
 import programpaths from "./routes/programRoutes.js";
+import coursepaths from "./routes/courseRoutes.js";
 import requireAuth from "./middleware/requiredAuth.js";
 
 dotenv.config();
@@ -36,6 +37,7 @@ mongoose
 // routes
 app.use("/api/auth", authpaths);
 app.use("/api", programpaths);
+app.use("/api", coursepaths);
 
 app.get("/api/auth/me", requireAuth, (req, res) => {
   res.json({
