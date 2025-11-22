@@ -18,13 +18,32 @@ export default function CourseDetails() {
       return;
     }
 
-    // Load course data from localStorage
-    const savedCourses = localStorage.getItem('courses');
-    if (savedCourses) {
-      const courses = JSON.parse(savedCourses);
-      const foundCourse = courses.find(c => c.code === courseCode);
-      setCourse(foundCourse);
-    }
+    // Load course data from API
+    const fetchCourseData = async () => {
+      try {
+        const response = await fetch('/api/courses', {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const courses = await response.json();
+          const foundCourse = courses.find(c => c.code === courseCode);
+          setCourse(foundCourse);
+        } else {
+          console.error('Failed to fetch courses:', response.status);
+          setCourse(null);
+        }
+      } catch (error) {
+        console.error('Error fetching course data:', error);
+        setCourse(null);
+      }
+    };
+
+    fetchCourseData();
 
     // Load enrolled students from localStorage (only for admin view)
     if (!isStudentView) {

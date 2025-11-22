@@ -164,10 +164,12 @@ router.post("/submit-message", requireAuth, async (req, res) => {
     const { fullName, email, phone, subject, message } = req.body; // Get form data
     const studentId = req.user.id; // Get student ID from login
 
-    t
+    // Step 1: Make sure all required fields are filled out
     if (!fullName || !email || !subject || !message) {
       return res.status(400).json({ message: 'Please fill out all required fields' });
     }
+
+    // Step 2: Save the message to the database
 
     const newMessage = await Message.create({
       studentId: studentId,
@@ -200,7 +202,7 @@ router.put("/profile", requireAuth, async (req, res) => {
       return res.status(400).json({ message: 'Email is required' });
     }
 
-    const validPrograms = ['Diploma (2 Years)', 'Post-Diploma (1 Year)', 'Bachelor (4 Years)'];
+    const validPrograms = ['Diploma (2 Years)', 'Post-Diploma (1 Year)', 'Certificate (6 Months)', 'Bachelor (4 Years)'];
     if (program && !validPrograms.includes(program)) {
       return res.status(400).json({ message: 'Please choose a valid program' });
     }
