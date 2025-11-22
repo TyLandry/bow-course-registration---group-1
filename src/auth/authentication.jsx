@@ -8,11 +8,40 @@ export function AuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const nav = useNavigate();
 
-  //Load user from the local storage if exists
+  //Load user from the backend session if it exists
   useEffect(() => {
-    const raw = localStorage.getItem("app_currentUser");
-    if (raw) setCurrentUser(JSON.parse(raw));
-    setIsLoading(false); //Mark loading as complete
+    let cancelled = false;
+
+    const loadCurrentUser = async () => {
+      try {
+        const res = await fetch("/api/auth/me", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!res.ok) {
+          throw new Error("Not authenticated");
+        }
+
+        const data = await res.json();
+        if (!cancelled) {
+          setCurrentUser(data);
+        }
+      } catch {
+        if (!cancelled) {
+          setCurrentUser(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadCurrentUser();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const normalizeEmail = (e) => e.trim().toLowerCase();
@@ -62,13 +91,12 @@ export function AuthProvider({ children }) {
 
     nav("/login", { replace: true });
   };
-  -------------------------------------------------------------------- */
+ */
 
   //Signup method calling backend API
   const signup = async ({
     email,
     password,
-    role, //ignored by server; role is enforced server-side
     firstName,
     lastName,
     phone,
@@ -101,11 +129,13 @@ export function AuthProvider({ children }) {
       throw new Error(data?.message || "Signup failed.");
     }
 
-    // Server sets cookie; you can store lightweight user data for UI
-    localStorage.setItem("app_currentUser", JSON.stringify(data));
+    // Automatically sign the new user in with the returned profile
     setCurrentUser(data);
 
-    nav("/login", { replace: true });
+    const role = data.role ?? "student";
+    nav(role === "student" ? "/student-dashboard" : "/admin-dashboard", {
+      replace: true,
+    });
   };
 
   /*Local storage login method (REPLACED WITH BACKEND CALLS)
@@ -140,8 +170,6 @@ export function AuthProvider({ children }) {
       throw new Error(data?.message || "Invalid credentials");
     }
 
-    //store what the backend returns for quick routing/UI
-    localStorage.setItem("app_currentUser", JSON.stringify(data));
     setCurrentUser(data);
 
     const role = data.role ?? "student";
@@ -150,34 +178,6 @@ export function AuthProvider({ children }) {
     });
     return true;
   };
-
-  //hardcode an admin user on first load for testing
-  useEffect(() => {
-    const users = JSON.parse(localStorage.getItem("app_users") || "[]");
-
-    //Add dummy admin only if no admin exists
-    if (!users.some((u) => u.role === "admin")) {
-      const adminDummy = [
-        {
-          firstName: "Admin",
-          lastName: "User",
-          email: "admin@example.com",
-          phone: "123-456-7890",
-          birthday: "1990-01-01",
-          department: "Software Development (SD)",
-          program: "Administration",
-          password: "adminpass",
-          role: "admin",
-          id: crypto.randomUUID(),
-        },
-      ];
-
-      localStorage.setItem(
-        "app_users",
-        JSON.stringify([...users, ...adminDummy])
-      );
-    }
-  }, []);
 
   const logout = async () => {
     try {
@@ -188,7 +188,6 @@ export function AuthProvider({ children }) {
     } catch {
       //ignore network errors on logout
     }
-    localStorage.removeItem("app_currentUser");
     setCurrentUser(null);
     nav("/login", { replace: true });
   };

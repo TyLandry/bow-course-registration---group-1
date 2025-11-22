@@ -4,37 +4,39 @@ import { useAuth } from "../../auth/authentication";
 export default function HeaderDesktop() {
   const { currentUser, logout } = useAuth();
 
+  const renderPublicNav = () => (
+    <header className="bg-2 text-white py-2 px-3">
+      <div className="mx-auto flex justify-between items-center">
+        <h1 className="text-xl font-bold cursor-none">
+          <Link to="/">Bow Course Registration</Link>
+        </h1>
+        <nav className="flex gap-4">
+          <Link
+            to="/"
+            className="px-3 py-2 text-sm rounded hover:text-[var(--system-orange)]"
+          >
+            Home
+          </Link>
+          <Link
+            to="/login"
+            className="px-3 py-2 text-sm rounded hover:text-[var(--system-orange)]"
+          >
+            Login
+          </Link>
+          <Link
+            to="/signup"
+            className="px-3 py-2 text-sm rounded hover:text-[var(--system-orange)]"
+          >
+            Sign Up
+          </Link>
+        </nav>
+      </div>
+    </header>
+  );
+
   // only home, login, and signup when no one's logged in
   if (!currentUser) {
-    return (
-      <header className="bg-2 text-white py-2 px-3">
-        <div className="mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-bold cursor-none">
-            <Link to="/">Bow Course Registration</Link>
-          </h1>
-          <nav className="flex gap-4">
-            <Link
-              to="/"
-              className="px-3 py-2 text-sm rounded hover:text-[var(--system-orange)]"
-            >
-              Home
-            </Link>
-            <Link
-              to="/login"
-              className="px-3 py-2 text-sm rounded hover:text-[var(--system-orange)]"
-            >
-              Login
-            </Link>
-            <Link
-              to="/signup"
-              className="px-3 py-2 text-sm rounded hover:text-[var(--system-orange)]"
-            >
-              Sign Up
-            </Link>
-          </nav>
-        </div>
-      </header>
-    );
+    return renderPublicNav();
   }
 
   // student header (only visible inside /student-dashboard)
@@ -109,5 +111,5 @@ export default function HeaderDesktop() {
         </div>
       </header>
     );
-  } else return null;
+  } else return renderPublicNav();
 }

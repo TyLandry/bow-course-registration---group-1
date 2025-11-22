@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import express from "express";
 import bcrypt from "bcryptjs";
-import User from "../models/user.js"; 
+import User from "../models/user.js";
 import { body, validationResult } from "express-validator";
 
 const router = express.Router();
@@ -18,28 +18,50 @@ function setAuthCookie(res, token) {
   res.cookie("token", token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production", 
-    maxAge: 7 * 24 * 60 * 60 * 1000
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 }
+
+const normalizeEmail = (value = "") => value.trim().toLowerCase();
+const escapeRegex = (value) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const buildEmailQuery = (email) => ({
+  email: { $regex: new RegExp(`^${escapeRegex(email)}$`, "i") },
+});
 
 //POST /api/auth/register
 router.post(
   "/register",
   [
     body("email").isEmail().withMessage("Invalid email address"),
-    body("password").isLength({ min: 6 }).withMessage("Password must be at least 6 characters long"),
+    body("password")
+      .isLength({ min: 6 })
+      .withMessage("Password must be at least 6 characters long"),
   ],
   async (req, res) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
 
-    let { firstName, lastName, email, phone, birthday, department, program, country, password, role } = req.body;
-    email = email.toLowerCase();
+    let {
+      firstName,
+      lastName,
+      email,
+      phone,
+      birthday,
+      department,
+      program,
+      country,
+      password,
+      role,
+    } = req.body;
+    email = normalizeEmail(email);
 
     try {
-      const exists = await User.findOne({ email });
-      if (exists) return res.status(409).json({ message: "User already exists" });
+      const exists = await User.findOne(buildEmailQuery(email));
+      if (exists)
+        return res.status(409).json({ message: "User already exists" });
 
       const hashed = await bcrypt.hash(password, 10);
 
@@ -70,7 +92,7 @@ router.post(
         department: user.department,
         program: user.program,
         country: user.country,
-        role: user.role 
+        role: user.role,
       });
     } catch (err) {
       console.error(err);
@@ -88,17 +110,32 @@ router.post(
   ],
   async (req, res) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+    if (!errors.isEmpty())
+      return res.status(400).json({ errors: errors.array() });
 
     let { email, password } = req.body;
-    email = email.toLowerCase();
+    email = normalizeEmail(email);
 
     try {
-      const user = await User.findOne({ email });
-      if (!user) return res.status(400).json({ message: "Invalid credentials" });
+      const user = await User.findOne(buildEmailQuery(email));
+      if (!user)
+        return res.status(400).json({ message: "Invalid credentials" });
 
-      const ok = await bcrypt.compare(password, user.password);
-      if (!ok) return res.status(400).json({ message: "Invalid credentials" });
+      let ok = false;
+      const storedPassword = user.password || "";
+
+      if (storedPassword.startsWith("$2")) {
+        ok = await bcrypt.compare(password, storedPassword);
+      } else {
+        ok = storedPassword === password;
+        if (ok) {
+          user.password = await bcrypt.hash(password, 10);
+          await user.save();
+        }
+      }
+
+      if (!ok)
+        return res.status(400).json({ message: "Invalid credentials" });
 
       const token = generateToken(user);
       setAuthCookie(res, token);
@@ -115,7 +152,7 @@ router.post(
         department: user.department,
         program: user.program,
         country: user.country,
-        role: user.role ?? "student"
+        role: user.role ?? "student",
       });
     } catch (err) {
       console.error(err);

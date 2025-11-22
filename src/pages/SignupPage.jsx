@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useAuth } from "../auth/authentication";
-import { useNavigate } from "react-router-dom";
 
 function SignUpPage() {
   const countryOptions = ["USA", "Canada", "UK", "Australia"];
@@ -13,7 +12,6 @@ function SignUpPage() {
   const [selectedCountry, setSelectedCountry] = useState("Canada");
 
   const { signup } = useAuth();
-  const navigate = useNavigate();
 
   const [form, setForm] = useState({
     firstName: "",
@@ -36,12 +34,13 @@ function SignUpPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     // Signup logic to be implemented
     setError("");
+    setSubmitting(true);
     try {
-      signup({
+      await signup({
         email: form.email,
         password: form.password,
         role: form.role,
@@ -53,7 +52,6 @@ function SignUpPage() {
         program: form.program,
         department: form.department,
       });
-      navigate("/login");
     } catch (err) {
       setError(err.message || "Sign up failed.");
     } finally {
@@ -200,9 +198,10 @@ function SignUpPage() {
           <div className="flex gap-4 mt-6">
             <button
               type="submit"
-              className="btn-primary-fill py-2 px-4 text-sm"
+              className="btn-primary-fill py-2 px-4 text-sm disabled:opacity-50"
+              disabled={submitting}
             >
-              Sign Up
+              {submitting ? "Signing Up..." : "Sign Up"}
             </button>
             <a href="/login">
               <button type="button" className="btn-primary-outlined text-sm">

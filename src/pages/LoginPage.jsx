@@ -7,12 +7,19 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    const ok = login(email, password);
-    if (!ok) setError("Invalid email or password.");
+    setSubmitting(true);
+    try {
+      await login(email, password);
+    } catch (err) {
+      setError(err.message || "Invalid email or password.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -58,9 +65,10 @@ function LoginPage() {
           <div className="flex gap-4 mt-6">
             <button
               type="submit"
-              className="btn-primary-fill py-2 px-4 text-sm"
+              className="btn-primary-fill py-2 px-4 text-sm disabled:opacity-50"
+              disabled={submitting}
             >
-              Login
+              {submitting ? "Logging in..." : "Login"}
             </button>
             <button type="button" className="btn-primary-outlined text-sm">
               <p className="py-2 px-3">Forgot Password</p>
