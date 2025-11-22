@@ -1,9 +1,10 @@
 import { useAuth } from "../auth/authentication";
 import { useState, useEffect } from "react";
-
+// this is the Profile Page component, it displays user information and allows editing
 function ProfilePage() {
   const { currentUser, setCurrentUser } = useAuth();
   const [showModal, setShowModal] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [formData, setFormData] = useState({
     id: "",
     email: "",
@@ -12,14 +13,34 @@ function ProfilePage() {
     program: "",
   });
 
-  useEffect(() => {
-    setFormData({
-      id: currentUser.id,
-      email: currentUser.email,
-      phone: currentUser.phone,
-      birthday: currentUser.birthday,
-      program: currentUser.program,
+  
+  const formatDateForDisplay = (dateString) => {
+    if (!dateString) return "—";
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
     });
+  };
+
+  // Helper function to format date for input (YYYY-MM-DD)
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+  };
+
+  useEffect(() => {
+    if (currentUser) {
+      setFormData({
+        id: currentUser.id || "",
+        email: currentUser.email || "",
+        phone: currentUser.phone || "",
+        birthday: formatDateForInput(currentUser.birthday) || "",
+        program: currentUser.program || "",
+      });
+    }
   }, [currentUser]);
 
   const handleInputChange = (e) => {
@@ -30,39 +51,61 @@ function ProfilePage() {
     }));
   };
 
-  const normalizeEmail = (e) => e.trim().toLowerCase();
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    try {
+      setIsUpdating(true);
+      console.log('Updating profile via API...');
 
-    const normalizedEmail = normalizeEmail(formData.email);
-    const users = JSON.parse(localStorage.getItem("app_users"));
-    const user = users.find((u) => u.id === formData.id);
-    const otherUsers = users.filter((u) => u.id !== formData.id);
+      // Only send student-relevant fields
+      const profileData = {
+        email: formData.email.trim(),
+        phone: formData.phone,
+        birthday: formData.birthday,
+        program: formData.program
+      };
 
-    // duplicate email check
-    if (otherUsers.some((u) => u.email === normalizedEmail)) {
-      throw new Error("Email already registered.");
-    }
+      const response = await fetch('/api/student/profile', {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(profileData)
+      });
 
-    user.email = formData.email;
-    user.phone = formData.phone;
-    user.birthday = formData.birthday;
-    user.program = formData.program;
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Profile updated successfully:', result);
 
-    for (var u in users) {
-      if (u.id === user.id) {
-        u = user;
-        break;
+        // Update current user context with new data
+        const updatedUser = {
+          ...currentUser,
+          email: profileData.email,
+          phone: profileData.phone,
+          birthday: profileData.birthday,
+          program: profileData.program
+        };
+        
+        setCurrentUser(updatedUser);
+        setShowModal(false);
+        
+        // Optional: Show success message
+        alert('Profile updated successfully!');
+      } else {
+        const errorData = await response.json();
+        console.error('Failed to update profile:', errorData.message);
+        alert(errorData.message || 'Failed to update profile');
       }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      alert('Failed to update profile. Please try again.');
+    } finally {
+      setIsUpdating(false);
     }
 
-    localStorage.setItem("app_users", JSON.stringify(users));
-    localStorage.setItem("app_currentUser", JSON.stringify(user));
-    // refresh currentUser
-    setCurrentUser(user);
 
-    setShowModal(false);
   };
 
   return (
@@ -99,7 +142,7 @@ function ProfilePage() {
 
           <div>
             <div className="text-[var(--system-gray)]">Birthday</div>
-            <div>{currentUser?.birthday || "—"}</div>
+            <div>{formatDateForDisplay(currentUser?.birthday)}</div>
           </div>
           <div>
             <div className="text-[var(--system-gray)]">
@@ -197,9 +240,10 @@ function ProfilePage() {
                   </button>
                   <button
                     type="submit"
-                    className="btn-primary-fill py-2 px-4 text-sm"
+                    disabled={isUpdating}
+                    className="btn-primary-fill py-2 px-4 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Submit
+                    {isUpdating ? 'Updating...' : 'Submit'}
                   </button>
                 </div>
               </form>

@@ -60,6 +60,7 @@ router.post(
       setAuthCookie(res, token);
 
       return res.status(201).json({
+        id: user._id,
         _id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -104,10 +105,16 @@ router.post(
 
       return res.json({
         message: "Login successful",
+        id: user._id,
         _id: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        phone: user.phone,
+        birthday: user.birthday,
+        department: user.department,
+        program: user.program,
+        country: user.country,
         role: user.role ?? "student"
       });
     } catch (err) {

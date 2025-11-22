@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 function ContactPage() {
   const [formData, setFormData] = useState({
@@ -9,6 +9,7 @@ function ContactPage() {
     subject: '',
     message: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -18,27 +19,44 @@ function ContactPage() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Save message to localStorage for admin to view
-    const prevMessages = JSON.parse(localStorage.getItem('submittedMessages') || '[]');
-    const newMessage = {
-      ...formData,
-      dateSubmitted: new Date().toISOString().split('T')[0],
-      status: 'New',
-      id: Date.now(),
-      messagePreview: formData.message.slice(0, 40) + (formData.message.length > 40 ? '...' : ''),
-      fullMessage: formData.message,
-    };
-    localStorage.setItem('submittedMessages', JSON.stringify([newMessage, ...prevMessages]));
-    alert('Message sent successfully!');
-    setFormData({
-      fullName: '',
-      email: '',
-      phone: '',
-      subject: '',
-      message: '',
-    });
+    
+    try {
+      setIsSubmitting(true);
+      console.log('Submitting message via API...');
+
+      // this is the real API call,
+      const response = await fetch('/api/student/submit-message', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Message submitted successfully:', result);
+        alert('Message sent successfully!');
+        setFormData({
+          fullName: '',
+          email: '',
+          phone: '',
+          subject: '',
+          message: '',
+        });
+      } else {
+        console.error('Failed to submit message:', response.status);
+        alert('Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting message:', error);
+      alert('Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -84,7 +102,13 @@ function ContactPage() {
             </p>
 
             <div className="flex gap-4 mt-6">
-              <button type="submit" className="btn-primary-fill py-2 px-4 text-sm">Submit</button>
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="btn-primary-fill py-2 px-4 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? 'Submitting...' : 'Submit'}
+              </button>
             </div>
           </form>
         </div>

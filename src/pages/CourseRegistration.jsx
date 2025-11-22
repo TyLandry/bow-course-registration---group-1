@@ -5,122 +5,146 @@ function CourseRegistration() {
   const navigate = useNavigate();
   const [selectedTerm, setSelectedTerm] = useState('Fall');
   const [availableCourses, setAvailableCourses] = useState([]);
-  const [allCourses, setAllCourses] = useState([]); // Store all courses from localStorage
+  const [allCourses, setAllCourses] = useState([]); // store all courses from API
 
-  // Load registered courses from localStorage 
-  // this state persists across page reloads, so users don't lose their selections
-  const [registeredCourses, setRegisteredCourses] = useState(() => {
-    const saved = localStorage.getItem('registeredCourses');
-    if (saved) {
-      return JSON.parse(saved);
-    }
-    // Start with empty array instead of mock data
-    return [];
-  });
+  const [registeredCourses, setRegisteredCourses] = useState([]);
+  const [isLoadingRegistered, setIsLoadingRegistered] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Available terms - simple season options without year limitations
+  // available terms - simple season options without year limitations
   const terms = ['All Terms', 'Fall', 'Winter', 'Spring', 'Summer'];
 
-  // Load all courses from localStorage (admin-added courses)
+
+  // this is the new API version, fetch courses from backend
   useEffect(() => {
-    const loadCourses = () => {
-      const savedCourses = localStorage.getItem('courses');
-      if (savedCourses) {
-        const courses = JSON.parse(savedCourses);
-        // Only show Active courses for registration
-        const activeCourses = courses.filter(course => course.status === 'Active');
-        setAllCourses(activeCourses);
-      } else {
+    const loadCourses = async () => {
+      try {
+        const response = await fetch('/api/courses', {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const courses = await response.json();
+          console.log('API Response - All courses:', courses);
+          
+          // only show Active courses for registration
+          const activeCourses = courses.filter(course => course.status === 'Active');
+          console.log('Active courses for registration:', activeCourses);
+          setAllCourses(activeCourses);
+        } else {
+          console.error('Failed to fetch courses:', response.status, response.statusText);
+          setAllCourses([]);
+        }
+      } catch (error) {
+        console.error('Error fetching courses:', error);
         setAllCourses([]);
       }
     };
 
-    // Load courses initially
+    // load courses initially
     loadCourses();
-
-    // Listen for localStorage changes (when admin adds courses)
-    const handleStorageChange = () => {
-      loadCourses();
-    };
-
-    // Add event listener for storage changes
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Custom event for same-window localStorage changes
-    window.addEventListener('localStorageChange', handleStorageChange);
-
-    // Cleanup event listeners
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('localStorageChange', handleStorageChange);
-    };
   }, []);
 
-  // Listen for updates to registered courses from other components (like CourseManagement)
+  // load registered courses from API
   useEffect(() => {
-    const handleRegisteredCoursesChange = (e) => {
-      // Only update if the event is from external source (not our own saves)
-      if (e.type === 'storage' || (e.detail && e.detail.key === 'registeredCourses')) {
-        const savedRegistered = localStorage.getItem('registeredCourses');
-        if (savedRegistered) {
-          const parsed = JSON.parse(savedRegistered);
-          // Only update if data is different to avoid infinite loop
-          setRegisteredCourses(prev => {
-            if (JSON.stringify(prev) !== savedRegistered) {
-              return parsed;
-            }
-            return prev;
-          });
+    const fetchRegisteredCourses = async () => {
+      try {
+        setIsLoadingRegistered(true);
+        console.log('Loading registered courses from API...');
+        
+        const response = await fetch('/api/student/enrolled-courses', {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const enrolledCourses = await response.json();
+          console.log('API Response - Enrolled courses:', enrolledCourses);
+          setRegisteredCourses(enrolledCourses);
+        } else {
+          console.error('Failed to load registered courses:', response.status);
+          setRegisteredCourses([]);
         }
+      } catch (error) {
+        console.error('Error loading registered courses:', error);
+        setRegisteredCourses([]);
+      } finally {
+        setIsLoadingRegistered(false);
       }
     };
 
-    window.addEventListener('storage', handleRegisteredCoursesChange);
-    window.addEventListener('localStorageChange', handleRegisteredCoursesChange);
-
-    return () => {
-      window.removeEventListener('storage', handleRegisteredCoursesChange);
-      window.removeEventListener('localStorageChange', handleRegisteredCoursesChange);
-    };
+    fetchRegisteredCourses();
   }, []);
+  // useEffect(() => {
+  //   const handleRegisteredCoursesChange = (e) => {
+  //     // Only update if the event is from external source (not our own saves)
+  //     if (e.type === 'storage' || (e.detail && e.detail.key === 'registeredCourses')) {
+  //       const savedRegistered = localStorage.getItem('registeredCourses');
+  //       if (savedRegistered) {
+  //         const parsed = JSON.parse(savedRegistered);
+  //         // Only update if data is different to avoid infinite loop
+  //         setRegisteredCourses(prev => {
+  //           if (JSON.stringify(prev) !== savedRegistered) {
+  //             return parsed;
+  //           }
+  //           return prev;
+  //         });
+  //       }
+  //     }
+  //   };
+  //
+  //   window.addEventListener('storage', handleRegisteredCoursesChange);
+  //   window.addEventListener('localStorageChange', handleRegisteredCoursesChange);
+  //
+  //   return () => {
+  //     window.removeEventListener('storage', handleRegisteredCoursesChange);
+  //     window.removeEventListener('localStorageChange', handleRegisteredCoursesChange);
+  //   };
+  // }, []);
 
-  // Filter courses based on selected term
-  // This updates whenever the term changes or new courses are added by admin
+  // filter courses based on selected term
+  // this updates whenever the term changes or new courses are added by admin
   useEffect(() => {
     const filtered = allCourses.filter((course) => {
-      // More flexible term matching - includes partial matches
+      // more flexible term matching - includes partial matches
       if (selectedTerm === 'All Terms') {
-        return true; // Show all courses if "All Terms" is selected
+        return true; // show all courses if "All Terms" is selected
       }
       
-      // Extract the season from selected term (e.g., "Fall" from "Fall 2025")
+      // extract the season from selected term (e.g., "Fall" from "Fall 2025")
       const selectedSeason = selectedTerm.split(' ')[0];
       
-      // Check if course term includes the selected season
+      // check if course term includes the selected season
       return course.term && course.term.toLowerCase().includes(selectedSeason.toLowerCase());
     });
     setAvailableCourses(filtered);
   }, [selectedTerm, allCourses]);
 
-  // Save registered courses to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem(
-      'registeredCourses',
-      JSON.stringify(registeredCourses)
-    );
+  
+  // useEffect(() => {
+  //   localStorage.setItem(
+  //     'registeredCourses',
+  //     JSON.stringify(registeredCourses)
+  //   );
+  //
+  //   // Other components listen to direct localStorage changes
+  // }, [registeredCourses]);
 
-    // Other components listen to direct localStorage changes
-  }, [registeredCourses]);
-
-  // Filter available courses by search term
+  // filter available courses by search term
   const filteredAvailableCourses = availableCourses.filter(
     (course) =>
       course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       course.code.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Merge registered courses with latest catalog details for display
+  // merge registered courses with latest catalog details for display
   const catalogByCode = useMemo(() => {
     return allCourses.reduce((acc, c) => {
       acc[c.code] = c;
@@ -135,99 +159,110 @@ function CourseRegistration() {
     }));
   }, [registeredCourses, catalogByCode]);
 
-  // Add course to registered courses
-  const addCourse = (course) => {
-    // Check if course is already registered
+  // this is the new API version
+  const addCourse = async (course) => {
+    // check if course is already registered
     if (registeredCourses.find((regCourse) => regCourse.code === course.code)) {
       alert('Course is already registered');
       return;
     }
 
-    const newRegisteredCourse = {
-      code: course.code,
-      name: course.name,
-      instructor: course.instructor || 'TBD',
-      term: course.term,
-      status: 'In Progress',
-    };
-
-    const updatedRegisteredCourses = [...registeredCourses, newRegisteredCourse];
-    setRegisteredCourses(updatedRegisteredCourses);
-    
-    // Save to localStorage
-    localStorage.setItem('registeredCourses', JSON.stringify(updatedRegisteredCourses));
-    
-    // Dispatch custom event for real-time updates to StudentDashboard
-    window.dispatchEvent(new CustomEvent('localStorageChange', {
-      detail: { key: 'registeredCourses', newValue: JSON.stringify(updatedRegisteredCourses) }
-    }));
-
-    // Build a notification and persist it so StudentDashboard will show it even if not mounted
-    const newNotification = {
-      icon: "🔔",
-      title: `You registered for ${course.name}`,
-      date: new Date().toLocaleDateString(),
-    };
     try {
-      const prev = JSON.parse(localStorage.getItem('app_notifications') || '[]');
-      const next = [newNotification, ...prev];
-      localStorage.setItem('app_notifications', JSON.stringify(next));
-      // Notify same-tab listeners of notification storage change
-      window.dispatchEvent(new CustomEvent('localStorageChange', {
-        detail: { key: 'app_notifications', newValue: JSON.stringify(next) }
-      }));
-    } catch (e) {
-      // ignore storage errors
-    }
+      console.log('Registering for course:', course.code);
+      
+      // this function calls the API to register for the course
+      const response = await fetch('/api/student/register-course', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ courseCode: course.code })
+      });
 
-    // Dispatch custom event for notifications (real-time)
-    window.dispatchEvent(new CustomEvent('courseAdded', {
-      detail: { courseName: course.name }
-    }));
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Registration successful:', result);
 
-    // Also save enrollment data for admin/course details view
-    const enrollmentData = {
-      courseCode: course.code,
-      courseName: course.name,
-      studentName: 'Current Student', // This would come from user authentication in a real app
-      studentId: 'STU001', // This would come from user authentication
-      enrollmentDate: new Date().toLocaleDateString(),
-      status: 'Enrolled'
-    };
+        // refresh enrolled courses from API to get latest data
+        const enrolledResponse = await fetch('/api/student/enrolled-courses', {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
 
-    // Get existing enrollments or create empty array
-    const existingEnrollments = JSON.parse(localStorage.getItem('courseEnrollments') || '[]');
-    
-    // Check if student is already enrolled in this course
-    const alreadyEnrolled = existingEnrollments.some(
-      enrollment => enrollment.courseCode === course.code && enrollment.studentId === 'STU001'
-    );
+        if (enrolledResponse.ok) {
+          const enrolledCourses = await enrolledResponse.json();
+          console.log('Refreshed enrolled courses:', enrolledCourses);
+          setRegisteredCourses(enrolledCourses);
+        }
 
-    if (!alreadyEnrolled) {
-      existingEnrollments.push(enrollmentData);
-      localStorage.setItem('courseEnrollments', JSON.stringify(existingEnrollments));
+        // Previously: Update local state manually (replaced with API refresh)
+        // const newRegisteredCourse = {
+        //   code: course.code,
+        //   name: course.name,
+        //   instructor: course.instructor || 'TBD',
+        //   term: course.term,
+        //   status: 'In Progress',
+        // };
+        // const updatedRegisteredCourses = [...registeredCourses, newRegisteredCourse];
+        // setRegisteredCourses(updatedRegisteredCourses);
+
+        // this is a simple alert, can be replaced with a better notification system
+        alert(`Successfully registered for ${course.name}!`);
+
+      } else {
+        const error = await response.json();
+        console.error('Registration failed:', error);
+        alert(`Registration failed: ${error.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error registering for course:', error);
+      alert('Registration failed due to network error. Please try again.');
     }
   };
 
-  // Remove course from registered courses
-  const removeCourse = (courseCode) => {
-    const updatedRegisteredCourses = registeredCourses.filter((course) => course.code !== courseCode);
-    setRegisteredCourses(updatedRegisteredCourses);
-    
-    // Save to localStorage
-    localStorage.setItem('registeredCourses', JSON.stringify(updatedRegisteredCourses));
-    
-    // Dispatch custom event for real-time updates to StudentDashboard
-    window.dispatchEvent(new CustomEvent('localStorageChange', {
-      detail: { key: 'registeredCourses', newValue: JSON.stringify(updatedRegisteredCourses) }
-    }));
+  // remove course from registered courses
+  const removeCourse = async (courseCode) => {
+    try {
+      console.log('Unenrolling from course:', courseCode);
+      
+      // call API to unenroll from course
+      const response = await fetch('/api/student/unenroll-course', {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ courseCode })
+      });
 
-    // Also remove from enrollments
-    const existingEnrollments = JSON.parse(localStorage.getItem('courseEnrollments') || '[]');
-    const updatedEnrollments = existingEnrollments.filter(
-      enrollment => !(enrollment.courseCode === courseCode && enrollment.studentId === 'STU001')
-    );
-    localStorage.setItem('courseEnrollments', JSON.stringify(updatedEnrollments));
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Unenrollment successful:', result);
+
+        // refresh enrolled courses from API to get latest data
+        const enrolledResponse = await fetch('/api/student/enrolled-courses', {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        // this is a simple alert.
+        if (enrolledResponse.ok) {
+          const enrolledCourses = await enrolledResponse.json();
+          console.log('Refreshed enrolled courses after unenrollment:', enrolledCourses);
+          setRegisteredCourses(enrolledCourses);
+        }
+      } else {
+        console.error('Failed to unenroll from course:', response.status);
+      }
+    } catch (error) {
+      console.error('Error unenrolling from course:', error);
+    }
   };
 
   return (

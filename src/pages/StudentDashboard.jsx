@@ -4,84 +4,79 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/authentication";
 // import coursesData from "../temp_data/courses.json";
 
-// This is the Student Dashboard component
-// It displays the student's name, registered courses, term selection, and notifications
+// this is the Student Dashboard component
+// it displays the student's name, registered courses, term selection, and notifications
 export default function StudentDashboard() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   // const [studentName] = useState("John Doe");
   const [selectedTerm, setSelectedTerm] = useState("Fall");
   const [enrolledCourses, setEnrolledCourses] = useState([]);
-  // Notifications state (load from localStorage for persistence)
-  const [notifications, setNotifications] = useState(() => {
-    try {
-      const raw = localStorage.getItem('app_notifications');
-      if (raw) return JSON.parse(raw);
-    } catch (e) {
-      // ignore parse errors
-    }
-    // Start with empty notifications instead of mock data
-    return [];
-  });
+  // this state holds notifications fetched from the API
+  const [notifications, setNotifications] = useState([]);
 
-  // Persist notifications when they change
+  // this will fetch notifications from the API when the component mounts, it will set the notifications state
   useEffect(() => {
-    try {
-      localStorage.setItem('app_notifications', JSON.stringify(notifications));
-    } catch (e) {
-      // ignore storage errors
-    }
-  }, [notifications]);
+    const fetchNotifications = async () => {
+      try {
+        const response = await fetch('/api/student/notifications', {
+          method: 'GET',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
 
-  // Load enrolled courses from localStorage and filter by selected term
-  useEffect(() => {
-    const savedCourses = localStorage.getItem('registeredCourses');
-    
-    if (savedCourses) {
-      const allRegisteredCourses = JSON.parse(savedCourses);
-      
-      // REMOVED ORPHAN CLEANUP - Let CourseManagement handle deletions
-      // Just display registered courses directly
-      const coursesForTerm = allRegisteredCourses.filter(
-        course => course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
-      );
-      setEnrolledCourses(coursesForTerm);
-    } else {
-      // If no saved courses, show empty list
-      setEnrolledCourses([]);
-    }
-  }, [selectedTerm]);
-
-  // Listen for localStorage changes to update courses in real-time
-  useEffect(() => {
-    const handleStorageChange = (e) => {
-      const savedCourses = localStorage.getItem('registeredCourses');
-      const availableCourses = localStorage.getItem('courses');
-      
-      if (savedCourses) {
-        const allRegisteredCourses = JSON.parse(savedCourses);
-        
-        // REMOVED ORPHAN CLEANUP - It was too aggressive during course edits
-        // Just display what's in registered courses without validation
-        const coursesForTerm = allRegisteredCourses.filter(
-          course => course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
-        );
-        setEnrolledCourses(coursesForTerm);
-      } else {
-        setEnrolledCourses([]);
+        if (response.ok) {
+          const apiNotifications = await response.json();
+          console.log('API Response - Notifications:', apiNotifications);
+          setNotifications(apiNotifications);
+        } else {
+          console.error('Failed to fetch notifications:', response.status, response.statusText);
+          setNotifications([]);
+        }
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+        setNotifications([]);
       }
     };
 
-    // Listen for storage events (when localStorage changes in other tabs/components)
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Custom event for same-tab localStorage changes
-    window.addEventListener('localStorageChange', handleStorageChange);
+    fetchNotifications();
+  }, []); // Run once on component mount
 
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('localStorageChange', handleStorageChange);
+  // this will fetch enrolled courses from the API when the component mounts or selectedTerm changes
+  useEffect(() => {
+    const fetchEnrolledCourses = async () => {
+      try {
+        const response = await fetch('/api/student/enrolled-courses', {
+          method: 'GET',
+          credentials: 'include', // Include auth cookies
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const allRegisteredCourses = await response.json();
+          console.log('API Response - All registered courses:', allRegisteredCourses);
+          
+          // filter by selected term (same logic as before)
+          const coursesForTerm = allRegisteredCourses.filter(
+            course => course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
+          );
+          console.log('Filtered courses for term', selectedTerm, ':', coursesForTerm);
+          setEnrolledCourses(coursesForTerm);
+        } else {
+          console.error('Failed to fetch courses:', response.status, response.statusText);
+          setEnrolledCourses([]);
+        }
+      } catch (error) {
+        console.error('Error fetching enrolled courses:', error);
+        setEnrolledCourses([]); // this is important to clear on error, it prevents stale data from being shown
+      }
     };
+
+    fetchEnrolledCourses();
   }, [selectedTerm]);
 
   // Listen for course added event to show notification
