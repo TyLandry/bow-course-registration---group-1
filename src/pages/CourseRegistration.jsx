@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+
+const API_URL = 'http://localhost:5050/api';
 
 function CourseRegistration() {
-  const navigate = useNavigate();
   const [selectedTerm, setSelectedTerm] = useState('Fall');
   const [availableCourses, setAvailableCourses] = useState([]);
   const [allCourses, setAllCourses] = useState([]); // store all courses from API
 
   const [registeredCourses, setRegisteredCourses] = useState([]);
-  const [isLoadingRegistered, setIsLoadingRegistered] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
   // available terms - simple season options without year limitations
@@ -53,7 +52,6 @@ function CourseRegistration() {
   useEffect(() => {
     const fetchRegisteredCourses = async () => {
       try {
-        setIsLoadingRegistered(true);
         console.log('Loading registered courses from API...');
         
         const response = await fetch('/api/student/enrolled-courses', {
@@ -75,8 +73,6 @@ function CourseRegistration() {
       } catch (error) {
         console.error('Error loading registered courses:', error);
         setRegisteredCourses([]);
-      } finally {
-        setIsLoadingRegistered(false);
       }
     };
 
@@ -230,7 +226,7 @@ function CourseRegistration() {
       console.log('Unenrolling from course:', courseCode);
       
       // call API to unenroll from course
-      const response = await fetch('/api/student/unenroll-course', {
+      const response = await fetch(`${API_URL}/student/unenroll-course`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
@@ -244,7 +240,7 @@ function CourseRegistration() {
         console.log('Unenrollment successful:', result);
 
         // refresh enrolled courses from API to get latest data
-        const enrolledResponse = await fetch('/api/student/enrolled-courses', {
+        const enrolledResponse = await fetch(`${API_URL}/student/enrolled-courses`, {
           method: 'GET',
           credentials: 'include',
           headers: {

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
+const API_URL = 'http://localhost:5050/api';
+
 export default function CourseManagement() {
   // Navigation and routing hooks
   const navigate = useNavigate();
@@ -9,6 +11,7 @@ export default function CourseManagement() {
   // Course data state
   const [courses, setCourses] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
+  const [loading, setLoading] = useState(false);
   
   // Filter and search state
   const [searchTerm, setSearchTerm] = useState('');
@@ -38,17 +41,31 @@ export default function CourseManagement() {
     prerequisites: 'None'
   });
 
-  // Load courses from localStorage on component mount
+  // Load courses from MongoDB API on component mount
   useEffect(() => {
-    const savedCourses = localStorage.getItem('courses');
-    if (savedCourses) {
-      const parsedCourses = JSON.parse(savedCourses);
-      setCourses(parsedCourses);
-      setFilteredCourses(parsedCourses);
-    } else {
-      setCourses([]);
-      setFilteredCourses([]);
-    }
+    const fetchCourses = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`${API_URL}/courses`);
+        if (response.ok) {
+          const data = await response.json();
+          setCourses(data);
+          setFilteredCourses(data);
+        } else {
+          console.error('Failed to fetch courses');
+          setCourses([]);
+          setFilteredCourses([]);
+        }
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+        setCourses([]);
+        setFilteredCourses([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
   }, []);
 
   // Handle navigation from other pages with edit course data
@@ -160,231 +177,111 @@ export default function CourseManagement() {
   };
 
   // Delete a course with confirmation
-  const handleDeleteCourse = (courseCode) => {
+  const handleDeleteCourse = async (courseCode) => {
     if (window.confirm('Are you sure you want to delete this course? This will also remove it from all student registrations.')) {
-      const updatedCourses = courses.filter(course => course.code !== courseCode);
-      setCourses(updatedCourses);
-      localStorage.setItem('courses', JSON.stringify(updatedCourses));
-      
-      // Remove course from all students' registered courses
       try {
-        const registeredCourses = JSON.parse(localStorage.getItem('registeredCourses') || '[]');
-        const updatedRegisteredCourses = registeredCourses.filter(course => 
-          course.code !== courseCode && course.courseCode !== courseCode
-        );
-        localStorage.setItem('registeredCourses', JSON.stringify(updatedRegisteredCourses));
-      } catch (e) {
-        // Silently handle errors
+        const response = await fetch(`${API_URL}/courses/${courseCode}`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          // Update local state
+          const updatedCourses = courses.filter(course => course.code !== courseCode);
+          setCourses(updatedCourses);
+          
+          // Get deleted course info for notification
+          const deletedCourse = courses.find(c => c.code === courseCode);
+          
+          // Dispatch notification event
+          window.dispatchEvent(new CustomEvent('courseDeleted', {
+            detail: { 
+              courseName: deletedCourse?.name || courseCode,
+              courseCode,
+              forceRefresh: true 
+            }
+          }));
+          
+          // Trigger refresh on admin dashboard
+          window.dispatchEvent(new CustomEvent('courseRefresh'));
+          
+          alert('Course deleted successfully');
+        } else {
+          const error = await response.json();
+          alert(`Failed to delete course: ${error.message}`);
+        }
+      } catch (error) {
+        console.error('Error deleting course:', error);
+        alert('Error deleting course. Please try again.');
       }
-      
-      // Remove course from course enrollments
-      try {
-        const courseEnrollments = JSON.parse(localStorage.getItem('courseEnrollments') || '[]');
-        const updatedEnrollments = courseEnrollments.filter(enrollment => 
-          enrollment.courseCode !== courseCode && enrollment.code !== courseCode
-        );
-        localStorage.setItem('courseEnrollments', JSON.stringify(updatedEnrollments));
-      } catch (e) {
-        // Silently handle errors
-      }
-      
-      // Force reload of localStorage data for all listening components
-      const registeredCoursesData = localStorage.getItem('registeredCourses');
-      const enrollmentsData = localStorage.getItem('courseEnrollments');
-      
-      // Dispatch custom event for real-time updates
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'courses',
-        newValue: JSON.stringify(updatedCourses)
-      }));
-      
-      // Dispatch events for registered courses and enrollments updates
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'registeredCourses',
-        newValue: registeredCoursesData
-      }));
-      
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'courseEnrollments',
-        newValue: enrollmentsData
-      }));
-      
-      // Also dispatch custom event for same-tab updates
-      window.dispatchEvent(new CustomEvent('localStorageChange', {
-        detail: { key: 'courses', newValue: JSON.stringify(updatedCourses) }
-      }));
-      
-      window.dispatchEvent(new CustomEvent('localStorageChange', {
-        detail: { key: 'registeredCourses', newValue: registeredCoursesData }
-      }));
-      
-      window.dispatchEvent(new CustomEvent('localStorageChange', {
-        detail: { key: 'courseEnrollments', newValue: enrollmentsData }
-      }));
-      
-      // Force a page refresh for student dashboards by dispatching a special event
-      window.dispatchEvent(new CustomEvent('courseDeleted', {
-        detail: { courseCode, forceRefresh: true }
-      }));
     }
   };
 
   // Handle form submission for adding/editing courses
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
-    let updatedCourses;
-    
-    // Update existing course or add new course
-    if (editingCourse) {
-      // FIRST: Update student registered courses with new course information
-      try {
-        const registeredCourses = JSON.parse(localStorage.getItem('registeredCourses') || '[]');
-        const updatedRegisteredCourses = registeredCourses.map(regCourse => {
-          if (regCourse.code === editingCourse.code || regCourse.courseCode === editingCourse.code) {
-            // Update the registered course with new information while preserving registration-specific data
-            return {
-              ...regCourse, // Keep registration status
-              name: formData.name, // Update course name
-              code: formData.code, // Update course code
-              courseCode: formData.code, // Update courseCode field
-              instructor: formData.instructor, // Update instructor
-              term: formData.term, // Update term
-              start: formData.start, // Update start date
-              end: formData.end, // Update end date
-              desc: formData.desc, // Update description
-              status: formData.status, // Update status
-              department: formData.department, // Update department
-              credits: formData.credits, // Update credits
-              prerequisites: formData.prerequisites // Update prerequisites
-            };
-          }
-          return regCourse;
+    try {
+      let response;
+      
+      if (editingCourse) {
+        // Update existing course
+        response = await fetch(`${API_URL}/courses/${editingCourse.code}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
         });
-        localStorage.setItem('registeredCourses', JSON.stringify(updatedRegisteredCourses));
-      } catch (e) {
-        console.error('Error updating registered courses:', e);
-      }
-      
-      // SECOND: Update course enrollments with new course information
-      try {
-        const courseEnrollments = JSON.parse(localStorage.getItem('courseEnrollments') || '[]');
-        const updatedEnrollments = courseEnrollments.map(enrollment => {
-          if (enrollment.courseCode === editingCourse.code || enrollment.code === editingCourse.code) {
-            return {
-              ...enrollment,
-              courseName: formData.name, // Update course name in enrollments
-              courseCode: formData.code, // Update course code
-              code: formData.code, // Update code field if it exists
-              term: formData.term, // Update term
-              instructor: formData.instructor, // Update instructor
-            };
-          }
-          return enrollment;
+      } else {
+        // Create new course
+        response = await fetch(`${API_URL}/courses`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
         });
-        localStorage.setItem('courseEnrollments', JSON.stringify(updatedEnrollments));
-      } catch (e) {
-        // Silently handle errors
       }
       
-      // THIRD: Update the main courses catalog
-      updatedCourses = courses.map(course =>
-        course.code === editingCourse.code ? { 
-          ...course, // Preserve original course properties (like id)
-          ...formData // Override with new form data
-        } : course
-      );
-    } else {
-      const newCourse = {
-        ...formData,
-        id: Date.now() // Simple ID generation
-      };
-      updatedCourses = [...courses, newCourse];
-    }
-    
-    // Save to state and localStorage
-    setCourses(updatedCourses);
-    localStorage.setItem('courses', JSON.stringify(updatedCourses));
-    
-    // Dispatch custom event for real-time updates
-    window.dispatchEvent(new StorageEvent('storage', {
-      key: 'courses',
-      newValue: JSON.stringify(updatedCourses)
-    }));
-    
-    // Dispatch events for updated registered courses and enrollments if this was an edit
-    if (editingCourse) {
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'registeredCourses',
-        newValue: localStorage.getItem('registeredCourses')
-      }));
-      
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'courseEnrollments',
-        newValue: localStorage.getItem('courseEnrollments')
-      }));
-    }
-    
-    // Also dispatch custom event for same-tab updates
-    window.dispatchEvent(new CustomEvent('localStorageChange', {
-      detail: { key: 'courses', newValue: JSON.stringify(updatedCourses) }
-    }));
-    
-    // Dispatch custom events for registered courses and enrollments if this was an edit
-    if (editingCourse) {
-      window.dispatchEvent(new CustomEvent('localStorageChange', {
-        detail: { key: 'registeredCourses', newValue: localStorage.getItem('registeredCourses') }
-      }));
-      
-      window.dispatchEvent(new CustomEvent('localStorageChange', {
-        detail: { key: 'courseEnrollments', newValue: localStorage.getItem('courseEnrollments') }
-      }));
-    }
-    
-    // Dispatch admin notification event
-    if (editingCourse) {
-      // Add notification to admin_notifications in localStorage
-      try {
-        const existingNotifications = JSON.parse(localStorage.getItem('admin_notifications') || '[]');
-        const newNotification = {
-          icon: "✏️",
-          title: `Course updated: ${formData.name}`,
-          date: new Date().toLocaleDateString(),
-          type: "course_edited",
-          id: Date.now()
-        };
-        const updatedNotifications = [newNotification, ...existingNotifications];
-        localStorage.setItem('admin_notifications', JSON.stringify(updatedNotifications));
-      } catch (e) {
-        // Silently handle errors
+      if (response.ok) {
+        const savedCourse = await response.json();
+        
+        // Update local state
+        let updatedCourses;
+        if (editingCourse) {
+          updatedCourses = courses.map(course =>
+            course.code === editingCourse.code ? savedCourse : course
+          );
+        } else {
+          updatedCourses = [...courses, savedCourse];
+        }
+        
+        setCourses(updatedCourses);
+        
+        // Dispatch notification event
+        if (editingCourse) {
+          window.dispatchEvent(new CustomEvent('courseEdited', {
+            detail: { courseName: formData.name, courseCode: formData.code }
+          }));
+        } else {
+          window.dispatchEvent(new CustomEvent('courseAdded', {
+            detail: { courseName: formData.name, courseCode: formData.code }
+          }));
+        }
+        
+        // Trigger refresh on admin dashboard
+        window.dispatchEvent(new CustomEvent('courseRefresh'));
+        
+        setShowModal(false);
+        alert(`Course ${editingCourse ? 'updated' : 'added'} successfully!`);
+      } else {
+        const error = await response.json();
+        alert(`Failed to ${editingCourse ? 'update' : 'add'} course: ${error.message}`);
       }
-      
-      window.dispatchEvent(new CustomEvent('courseEdited', {
-        detail: { courseName: formData.name, courseCode: formData.code }
-      }));
-    } else {
-      // Add notification to admin_notifications in localStorage
-      try {
-        const existingNotifications = JSON.parse(localStorage.getItem('admin_notifications') || '[]');
-        const newNotification = {
-          icon: "📚",
-          title: `New course added: ${formData.name}`,
-          date: new Date().toLocaleDateString(),
-          type: "course_added",
-          id: Date.now()
-        };
-        const updatedNotifications = [newNotification, ...existingNotifications];
-        localStorage.setItem('admin_notifications', JSON.stringify(updatedNotifications));
-      } catch (e) {
-        // Silently handle errors
-      }
-      
-      window.dispatchEvent(new CustomEvent('courseAdded', {
-        detail: { courseName: formData.name, courseCode: formData.code }
-      }));
+    } catch (error) {
+      console.error('Error submitting course:', error);
+      alert('Error saving course. Please try again.');
     }
-    
-    setShowModal(false);
   };
 
   // Handle form input changes
@@ -452,7 +349,11 @@ export default function CourseManagement() {
       {/* Course List Table */}
       <div>
         <h2 className="font-semibold mb-4">Course List</h2>
-        {currentCourses.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-8">
+            <p className="text-[var(--system-gray)] text-sm">Loading courses...</p>
+          </div>
+        ) : currentCourses.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-[var(--system-gray)] text-sm">No courses found.</p>
           </div>

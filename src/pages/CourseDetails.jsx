@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
+const API_URL = 'http://localhost:5050/api';
+
 export default function CourseDetails() {
   const { courseCode } = useParams();
   const navigate = useNavigate();
@@ -21,7 +23,7 @@ export default function CourseDetails() {
     // Load course data from API
     const fetchCourseData = async () => {
       try {
-        const response = await fetch('/api/courses', {
+        const response = await fetch(`${API_URL}/courses`, {
           method: 'GET',
           credentials: 'include',
           headers: {
@@ -73,33 +75,30 @@ export default function CourseDetails() {
     }
   };
 
-  const handleRemoveCourse = () => {
+  const handleRemoveCourse = async () => {
     if (window.confirm(`Are you sure you want to remove "${course.name}" from your registered courses?`)) {
-      // Remove from registered courses
-      const savedCourses = localStorage.getItem('registeredCourses');
-      if (savedCourses) {
-        const registeredCourses = JSON.parse(savedCourses);
-        const updatedCourses = registeredCourses.filter(c => c.code !== courseCode);
-        localStorage.setItem('registeredCourses', JSON.stringify(updatedCourses));
-        
-        // Dispatch event for real-time updates
-        window.dispatchEvent(new CustomEvent('localStorageChange', {
-          detail: { key: 'registeredCourses', newValue: JSON.stringify(updatedCourses) }
-        }));
-      }
+      try {
+        // Call API to unenroll from course
+        const response = await fetch(`${API_URL}/student/unenroll-course`, {
+          method: 'DELETE',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ courseCode })
+        });
 
-      // Remove from enrollments
-      const savedEnrollments = localStorage.getItem('courseEnrollments');
-      if (savedEnrollments) {
-        const enrollments = JSON.parse(savedEnrollments);
-        const updatedEnrollments = enrollments.filter(
-          enrollment => !(enrollment.courseCode === courseCode && enrollment.studentId === 'STU001')
-        );
-        localStorage.setItem('courseEnrollments', JSON.stringify(updatedEnrollments));
+        if (response.ok) {
+          alert('Course removed successfully!');
+          // Navigate back to student dashboard
+          navigate('/student-dashboard');
+        } else {
+          alert('Failed to remove course. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error removing course:', error);
+        alert('Error removing course. Please try again.');
       }
-      
-      // Navigate back to student dashboard
-      navigate('/student-dashboard');
     }
   };
 

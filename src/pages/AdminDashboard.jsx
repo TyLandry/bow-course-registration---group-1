@@ -1,67 +1,43 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/authentication";
-// import coursesData from "../temp_data/courses.json";
+
+const API_URL = 'http://localhost:5050/api';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
   const [selectedTerm, setSelectedTerm] = useState("Fall");
   const [termCourses, setTermCourses] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // Load courses from localStorage and filter by selected term
+  // Fetch courses from MongoDB API
   useEffect(() => {
-    const loadCourses = () => {
-      const savedCourses = localStorage.getItem('courses');
-      if (savedCourses) {
-        const courses = JSON.parse(savedCourses);
-        
-        // Filter courses by selected term using partial matching
-        const filteredCourses = courses.filter(course => 
-          course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
-        );
-        setTermCourses(filteredCourses);
-      } else {
+    const loadCourses = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`${API_URL}/courses`);
+        if (response.ok) {
+          const courses = await response.json();
+          
+          // Filter courses by selected term using partial matching
+          const filteredCourses = courses.filter(course => 
+            course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
+          );
+          setTermCourses(filteredCourses);
+        } else {
+          console.error('Failed to fetch courses');
+          setTermCourses([]);
+        }
+      } catch (error) {
+        console.error('Error fetching courses:', error);
         setTermCourses([]);
+      } finally {
+        setLoading(false);
       }
     };
 
     loadCourses();
-  }, [selectedTerm]);
-
-  // Listen for localStorage changes to update courses in real-time
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const savedCourses = localStorage.getItem('courses');
-      if (savedCourses) {
-        const courses = JSON.parse(savedCourses);
-        
-        // Filter courses by selected term using partial matching
-        const filteredCourses = courses.filter(course => 
-          course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
-        );
-        setTermCourses(filteredCourses);
-      }
-      
-      // Also reload notifications when storage changes
-      try {
-        const savedNotifications = localStorage.getItem('admin_notifications');
-        if (savedNotifications) {
-          setNotifications(JSON.parse(savedNotifications));
-        }
-      } catch (e) {
-        // Silently handle errors
-      }
-    };
-
-    // Listen for storage events and custom events
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('localStorageChange', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('localStorageChange', handleStorageChange);
-    };
   }, [selectedTerm]);
 
   // Admin notifications state (load from localStorage for persistence)
@@ -123,17 +99,39 @@ export default function AdminDashboard() {
       }
     };
 
+    const handleCourseRefresh = () => {
+      // Reload courses when this event is triggered
+      loadCoursesDirectly();
+    };
+
+    const loadCoursesDirectly = async () => {
+      try {
+        const response = await fetch(`${API_URL}/courses`);
+        if (response.ok) {
+          const courses = await response.json();
+          const filteredCourses = courses.filter(course => 
+            course.term && course.term.toLowerCase().includes(selectedTerm.toLowerCase())
+          );
+          setTermCourses(filteredCourses);
+        }
+      } catch (error) {
+        console.error('Error refreshing courses:', error);
+      }
+    };
+
     // Listen for custom events
     window.addEventListener('courseAdded', handleCourseAdded);
     window.addEventListener('courseEdited', handleCourseEdited);
     window.addEventListener('courseDeleted', handleCourseDeleted);
+    window.addEventListener('courseRefresh', handleCourseRefresh);
 
     return () => {
       window.removeEventListener('courseAdded', handleCourseAdded);
       window.removeEventListener('courseEdited', handleCourseEdited);
       window.removeEventListener('courseDeleted', handleCourseDeleted);
+      window.removeEventListener('courseRefresh', handleCourseRefresh);
     };
-  }, []);
+  }, [selectedTerm]);
 
   // Handle navigation to course details page
   const handleViewCourseDetails = (courseCode) => {
@@ -235,7 +233,9 @@ export default function AdminDashboard() {
 
         <div className="mb-4">
           <h3 className="font-semibold mb-2">Available Courses</h3>
-          {termCourses.length === 0 ? (
+          {loading ? (
+            <p className="text-gray-500 text-sm">Loading courses...</p>
+          ) : termCourses.length === 0 ? (
             <p className="text-gray-500 text-sm">
               No courses available for {selectedTerm}.
             </p>

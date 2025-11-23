@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/authentication";
-// import coursesData from "../temp_data/courses.json";
+
+const API_URL = 'http://localhost:5050/api';
 
 // this is the Student Dashboard component
 // it displays the student's name, registered courses, term selection, and notifications
@@ -19,7 +20,7 @@ export default function StudentDashboard() {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await fetch('/api/student/notifications', {
+        const response = await fetch(`${API_URL}/student/notifications`, {
           method: 'GET',
           credentials: 'include',
           headers: {
@@ -48,7 +49,7 @@ export default function StudentDashboard() {
   useEffect(() => {
     const fetchEnrolledCourses = async () => {
       try {
-        const response = await fetch('/api/student/enrolled-courses', {
+        const response = await fetch(`${API_URL}/student/enrolled-courses`, {
           method: 'GET',
           credentials: 'include', // Include auth cookies
           headers: {

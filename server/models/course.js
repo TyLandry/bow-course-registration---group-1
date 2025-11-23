@@ -31,7 +31,8 @@ const courseSchema = new mongoose.Schema({
   },
   desc: {
     type: String,
-    required: true,
+    required: false,
+    default: '',
   },
   status: {
     type: String,
