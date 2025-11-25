@@ -88,7 +88,9 @@ export default function SubmittedForms() {
               <div className="mt-3 text-gray-700 text-sm">
                 <p>
                   <span className="font-medium">Message Preview:</span>{" "}
-                  {msg.messagePreview}
+                  {msg.message.length > 30
+                    ? msg.message.slice(0, 30) + "..."
+                    : msg.message}
                 </p>
               </div>
 
