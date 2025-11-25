@@ -1,10 +1,6 @@
 import mongoose from "mongoose";
 
 const courseSchema = new mongoose.Schema({
-  _id: {
-    type: String,
-    required: true,
-  },
   name: {
     type: String,
     required: true,
@@ -12,6 +8,7 @@ const courseSchema = new mongoose.Schema({
   code: {
     type: String,
     required: true,
+    unique: true,
   },
   term: {
     type: String,
@@ -32,7 +29,7 @@ const courseSchema = new mongoose.Schema({
   desc: {
     type: String,
     required: false,
-    default: '',
+    default: "",
   },
   status: {
     type: String,

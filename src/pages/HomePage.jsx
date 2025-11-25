@@ -36,7 +36,6 @@ function HomePage() {
           throw new Error("Failed to fetch programs");
         }
         const data = await response.json();
-        // Set the first 6 courses as featured courses
         setPrograms(data);
       } catch (err) {
         console.log(err.message);

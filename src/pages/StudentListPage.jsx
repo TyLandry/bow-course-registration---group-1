@@ -10,21 +10,21 @@ export default function StudentListPage() {
 
   // Load students from localStorage on component mount
   useEffect(() => {
-    try {
-      const allUsers = JSON.parse(localStorage.getItem("app_users") || "[]");
-      
-      // Filter only student users
-      const studentUsers = allUsers
-        .filter(user => user.role === "student")
-        .map(user => ({
-          ...user,
-          department: "Software Development", // Add default department since it's expected by Student component
-        }));
-      
-      setStudents(studentUsers);
-    } catch (error) {
-      setStudents([]);
-    }
+    const fetchStudents = async () => {
+      try {
+        const response = await fetch("/api/admin/students", {
+          credentials: "include",
+        });
+        if (!response.ok) {
+          throw new Error("Failed to fetch student information");
+        }
+        const data = await response.json();
+        setStudents(data);
+      } catch (err) {
+        console.log(err.message);
+      }
+    };
+    fetchStudents();
   }, []);
 
   useEffect(() => {
@@ -32,36 +32,38 @@ export default function StudentListPage() {
       setFilteredStudent([]);
       return;
     }
-    
+
     // Filter by program - simplified logic
     let result = students;
     if (selectedProgram !== "All Programs") {
       result = students.filter((s) => {
         if (!s.program) return false;
-        
+
         // Simple case-insensitive includes check with null safety
         const programLower = s.program.toLowerCase();
         const selectedLower = selectedProgram.toLowerCase();
-        
-        return programLower.includes(selectedLower) || 
-               (selectedProgram === "Diploma" && programLower.includes("sd"));
+
+        return (
+          programLower.includes(selectedLower) ||
+          (selectedProgram === "Diploma" && programLower.includes("sd"))
+        );
       });
     }
-    
+
     // Filter by search term with null safety
-    const finalResult = result.filter(
-      (r) => {
-        const firstName = r.firstName || "";
-        const lastName = r.lastName || "";
-        const id = r.id || "";
-        const searchLower = searchValue.toLowerCase();
-        
-        return firstName.toLowerCase().includes(searchLower) ||
-               lastName.toLowerCase().includes(searchLower) ||
-               id.toLowerCase().includes(searchLower);
-      }
-    );
-    
+    const finalResult = result.filter((r) => {
+      const firstName = r.firstName || "";
+      const lastName = r.lastName || "";
+      const id = r.id || "";
+      const searchLower = searchValue.toLowerCase();
+
+      return (
+        firstName.toLowerCase().includes(searchLower) ||
+        lastName.toLowerCase().includes(searchLower) ||
+        id.toLowerCase().includes(searchLower)
+      );
+    });
+
     setFilteredStudent(finalResult);
   }, [selectedProgram, searchValue, students]);
 
@@ -73,7 +75,7 @@ export default function StudentListPage() {
           Manage student registrations in the Software Development department.
         </p>
       </div>
-      
+
       {/* Search and Filter Section */}
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start lg:items-end">
         <div className="w-full lg:flex-1">
@@ -85,23 +87,25 @@ export default function StudentListPage() {
             className="border border-gray-400 rounded-md px-3 py-2 w-full max-w-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        
+
         <div className="w-full lg:w-auto">
           <h2 className="font-semibold mb-2">Filter by Program</h2>
           <div className="flex flex-wrap gap-2 lg:gap-3">
-            {["All Programs", "Diploma", "Post-Diploma", "Certificate"].map((program) => (
-              <button
-                key={program}
-                onClick={() => setSelectedProgram(program)}
-                className={`px-3 lg:px-4 py-2 text-xs lg:text-sm rounded-md transition-colors ${
-                  selectedProgram === program
-                    ? "bg-1 text-white"
-                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                }`}
-              >
-                {program}
-              </button>
-            ))}
+            {["All Programs", "Diploma", "Post-Diploma", "Certificate"].map(
+              (program) => (
+                <button
+                  key={program}
+                  onClick={() => setSelectedProgram(program)}
+                  className={`px-3 lg:px-4 py-2 text-xs lg:text-sm rounded-md transition-colors ${
+                    selectedProgram === program
+                      ? "bg-1 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  {program}
+                </button>
+              )
+            )}
           </div>
         </div>
       </div>
@@ -124,10 +128,13 @@ export default function StudentListPage() {
             </thead>
             <tbody>
               {filteredStudent.length === 0 ? (
-                <tr>
-                  <td colSpan="8" className="text-center py-8 text-[var(--system-gray)] text-xs lg:text-sm">
-                    {students.length === 0 
-                      ? "No students found in the system." 
+                <tr key="no-students">
+                  <td
+                    colSpan="8"
+                    className="text-center py-8 text-[var(--system-gray)] text-xs lg:text-sm"
+                  >
+                    {students.length === 0
+                      ? "No students found in the system."
                       : "No students found matching the current filter."}
                   </td>
                 </tr>
@@ -167,12 +174,12 @@ export default function StudentListPage() {
             </tbody>
           </table>
         </div>
-        
+
         {/* Scroll hint */}
         <p className="text-xs text-gray-500 mt-2 text-center sm:hidden">
           Scroll horizontally to see all columns
         </p>
-        
+
         {filteredStudent.length > 4 && (
           <div className="flex justify-center mt-5">
             <button

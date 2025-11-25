@@ -12,19 +12,19 @@ import {
 const router = express.Router();
 
 // GET /api/student/enrolled-courses
-router.get("/enrolled-courses", requireAuth, getEnrolledCourses);
+router.get("/enrolled-courses", getEnrolledCourses);
 
 // GET /api/student/notifications
-router.get("/notifications", requireAuth, getStudentNotifications);
+router.get("/notifications", getStudentNotifications);
 
 // POST /api/student/register-course
-router.post("/register-course", requireAuth, signupForCourse);
+router.post("/register-course", signupForCourse);
 
 // DELETE /api/student/unenroll-course
-router.delete("/unenroll-course", requireAuth, deleteStudentFromCourse);
+router.delete("/unenroll-course", deleteStudentFromCourse);
 
 // POST /api/student/submit-message
-router.post("/submit-message", requireAuth, createMessage);
+router.post("/submit-message", createMessage);
 
 // PUT /api/student/profile
 router.put("/profile", requireAuth, updateStudentProfile);

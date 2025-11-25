@@ -7,6 +7,8 @@ import authpaths from "./routes/authRoutes.js";
 import programpaths from "./routes/programRoutes.js";
 import coursepaths from "./routes/courseRoutes.js";
 import studentpaths from "./routes/studentRoutes.js";
+import adminpaths from "./routes/adminRoutes.js";
+import messagepaths from "./routes/messageRoutes.js";
 import requireAuth from "./middleware/requiredAuth.js";
 import User from "./models/user.js";
 
@@ -40,7 +42,9 @@ mongoose
 app.use("/api/auth", authpaths);
 app.use("/api", programpaths);
 app.use("/api", coursepaths);
-app.use("/api/student", studentpaths);
+app.use("/api", messagepaths);
+app.use("/api/student", requireAuth("student"), studentpaths);
+app.use("/api/admin", requireAuth("admin"), adminpaths);
 
 app.get("/api/auth/me", requireAuth, async (req, res) => {
   try {
@@ -79,11 +83,3 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-
-//React dev origin
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  })
-);

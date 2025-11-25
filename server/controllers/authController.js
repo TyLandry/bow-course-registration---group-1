@@ -5,7 +5,7 @@ import User from "../models/user.js";
 
 function generateToken(user) {
   return jwt.sign(
-    { id: user._id, email: user.email },
+    { id: user._id, email: user.email, role: user.role },
     process.env.JWT_SECRET,
     { expiresIn: "7d" } //keep users logged in longer if you like
   );
@@ -32,6 +32,7 @@ export async function register(req, res) {
     return res.status(400).json({ errors: errors.array() });
 
   let {
+    id,
     firstName,
     lastName,
     email,
@@ -52,6 +53,7 @@ export async function register(req, res) {
     const hashed = await bcrypt.hash(password, 10);
 
     const user = await User.create({
+      id,
       firstName,
       lastName,
       email,
