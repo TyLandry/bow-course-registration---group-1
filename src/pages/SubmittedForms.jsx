@@ -7,7 +7,9 @@ export default function SubmittedForms() {
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await fetch("/api/messages");
+        const response = await fetch("/api/admin/messages", {
+          credentials: "include",
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch messages");
         }
@@ -48,7 +50,7 @@ export default function SubmittedForms() {
           )}
           {messages.map((msg) => (
             <div
-              key={msg.id}
+              key={msg._id}
               className="border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200"
             >
               {/* Top Row: Student info + ID + Term */}

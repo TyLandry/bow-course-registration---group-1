@@ -4,6 +4,7 @@ import {
   createCourse,
   updateCourse,
   deleteCourse,
+  getMessages,
 } from "../controllers/adminController.js";
 
 const router = express.Router();
@@ -19,5 +20,8 @@ router.put("/courses/:code", updateCourse);
 
 // Delete course
 router.delete("/courses/:code", deleteCourse);
+
+// GET messages
+router.get("/messages", getMessages);
 
 export default router;

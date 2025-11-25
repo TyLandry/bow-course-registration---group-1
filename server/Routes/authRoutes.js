@@ -6,9 +6,13 @@ import {
   login,
   logout,
   updateProfile,
+  getUser,
 } from "../controllers/authController.js";
 
 const router = express.Router();
+
+//GET /api/auth/me
+router.get("/me", requireAuth(), getUser);
 
 //POST /api/auth/register
 router.post(

@@ -1,4 +1,3 @@
-import User from "../models/user.js";
 import Course from "../models/course.js";
 import Enrollment from "../models/enrollment.js";
 import Message from "../models/message.js";

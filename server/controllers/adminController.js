@@ -1,5 +1,6 @@
 import Course from "../models/course.js";
 import User from "../models/user.js";
+import Message from "../models/message.js";
 
 // Get all student information
 export const getStudents = async (req, res) => {
@@ -128,3 +129,14 @@ export const deleteCourse = async (req, res) => {
       .json({ message: "Server error", error: err.message });
   }
 };
+
+// Gets all messages
+export async function getMessages(req, res) {
+  try {
+    const messages = await Message.find({});
+    res.status(200).json(messages);
+  } catch (error) {
+    console.error("Error getting messages:", error);
+    res.status(500).json({ message: "Could not get messages" });
+  }
+}

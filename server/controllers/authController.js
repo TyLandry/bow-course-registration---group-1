@@ -26,6 +26,32 @@ const buildEmailQuery = (email) => ({
   email: { $regex: new RegExp(`^${escapeRegex(email)}$`, "i") },
 });
 
+export async function getUser(req, res) {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      id: user._id,
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone,
+      birthday: user.birthday,
+      department: user.department,
+      program: user.program,
+      country: user.country,
+      role: user.role ?? "student",
+    });
+  } catch (err) {
+    console.error("Failed to fetch authenticated user", err);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
 export async function register(req, res) {
   const errors = validationResult(req);
   if (!errors.isEmpty())
