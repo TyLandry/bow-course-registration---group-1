@@ -146,3 +146,70 @@ export function logout(req, res) {
   });
   res.json({ ok: true });
 }
+
+// Update  personal information
+export async function updateProfile(req, res) {
+  try {
+    const { email, phone, birthday, program } = req.body; // Get form data
+    const id = req.user.id; // Get ID from login
+    const role = req.user.role;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    if (role === "student") {
+      const validPrograms = [
+        "Diploma (2 Years)",
+        "Post-Diploma (1 Year)",
+        "Certificate (6 Months)",
+        "Bachelor (4 Years)",
+      ];
+      if (program && !validPrograms.includes(program)) {
+        return res
+          .status(400)
+          .json({ message: "Please choose a valid program" });
+      }
+    }
+
+    const updateData = {
+      email: email.trim().toLowerCase(), // Clean up email format
+      phone: phone || "", // Use empty string if no phone
+      birthday: birthday || "", // Use empty string if no birthday
+      program: program || role === "student" ? "Diploma (2 Years)" : "N/A", // Default program if none chosen
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id, // Find this user
+      updateData, // Update with new data
+      { new: true, runValidators: true } // Return updated record and validate
+    ).select("-password"); // Don't include password in response
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      profile: {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        phone: updatedUser.phone || "",
+        birthday: updatedUser.birthday || "",
+        program:
+          updatedUser.program || role === "student"
+            ? "Diploma (2 Years)"
+            : "N/A",
+      },
+    });
+  } catch (error) {
+    // If the email is already used by another student
+    if (error.code === 11000) {
+      return res
+        .status(400)
+        .json({ message: "Email already in use by another user" });
+    }
+    console.error("Error updating profile:", error);
+    res.status(500).json({ message: "Failed to update profile" });
+  }
+}

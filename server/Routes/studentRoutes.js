@@ -1,12 +1,10 @@
 import express from "express";
-import requireAuth from "../middleware/requiredAuth.js";
 import {
   getEnrolledCourses,
   getStudentNotifications,
   signupForCourse,
   deleteStudentFromCourse,
   createMessage,
-  updateStudentProfile,
 } from "../controllers/studentController.js";
 
 const router = express.Router();
@@ -25,8 +23,5 @@ router.delete("/unenroll-course", deleteStudentFromCourse);
 
 // POST /api/student/submit-message
 router.post("/submit-message", createMessage);
-
-// PUT /api/student/profile
-router.put("/profile", requireAuth, updateStudentProfile);
 
 export default router;

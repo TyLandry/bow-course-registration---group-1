@@ -1,6 +1,12 @@
 import express from "express";
+import requireAuth from "../middleware/requiredAuth.js";
 import { body } from "express-validator";
-import { register, login, logout } from "../controllers/authController.js";
+import {
+  register,
+  login,
+  logout,
+  updateProfile,
+} from "../controllers/authController.js";
 
 const router = express.Router();
 
@@ -25,6 +31,9 @@ router.post(
   ],
   login
 );
+
+// PUT /api/auth/profile
+router.put("/profile", requireAuth(), updateProfile);
 
 router.post("/logout", logout);
 
