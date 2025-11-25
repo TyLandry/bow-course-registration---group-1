@@ -1,7 +1,4 @@
-import express from "express";
 import Course from "../models/course.js";
-
-const router = express.Router();
 
 // Get all courses
 export const getCourses = async (req, res) => {
@@ -18,8 +15,8 @@ export const getCourses = async (req, res) => {
 export const getCoursesByTerm = async (req, res) => {
   try {
     const { term } = req.params;
-    const courses = await Course.find({ 
-      term: { $regex: term, $options: 'i' } 
+    const courses = await Course.find({
+      term: { $regex: term, $options: "i" },
     });
     return res.status(200).json(courses);
   } catch (err) {
@@ -46,14 +43,28 @@ export const getCourseByCode = async (req, res) => {
 // Create new course
 export const createCourse = async (req, res) => {
   try {
-    const { name, code, term, instructor, start, end, desc, status, department, credits, prerequisites } = req.body;
-    
+    const {
+      name,
+      code,
+      term,
+      instructor,
+      start,
+      end,
+      desc,
+      status,
+      department,
+      credits,
+      prerequisites,
+    } = req.body;
+
     // Check if course with same code already exists
     const existingCourse = await Course.findOne({ code });
     if (existingCourse) {
-      return res.status(400).json({ message: "Course with this code already exists" });
+      return res
+        .status(400)
+        .json({ message: "Course with this code already exists" });
     }
-    
+
     const newCourse = new Course({
       _id: code, // Using course code as _id for uniqueness
       name,
@@ -63,17 +74,19 @@ export const createCourse = async (req, res) => {
       start,
       end,
       desc,
-      status: status || 'Active',
-      department: department || 'Computer Science',
+      status: status || "Active",
+      department: department || "Computer Science",
       credits: credits || 3,
-      prerequisites: prerequisites || 'None'
+      prerequisites: prerequisites || "None",
     });
-    
+
     await newCourse.save();
     return res.status(201).json(newCourse);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Server error", error: err.message });
+    return res
+      .status(500)
+      .json({ message: "Server error", error: err.message });
   }
 };
 
@@ -81,13 +94,24 @@ export const createCourse = async (req, res) => {
 export const updateCourse = async (req, res) => {
   try {
     const { code } = req.params;
-    const { name, term, instructor, start, end, desc, status, department, credits, prerequisites } = req.body;
-    
+    const {
+      name,
+      term,
+      instructor,
+      start,
+      end,
+      desc,
+      status,
+      department,
+      credits,
+      prerequisites,
+    } = req.body;
+
     const course = await Course.findOne({ code });
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
-    
+
     // Update fields
     if (name) course.name = name;
     if (term) course.term = term;
@@ -99,12 +123,14 @@ export const updateCourse = async (req, res) => {
     if (department) course.department = department;
     if (credits) course.credits = credits;
     if (prerequisites) course.prerequisites = prerequisites;
-    
+
     await course.save();
     return res.status(200).json(course);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Server error", error: err.message });
+    return res
+      .status(500)
+      .json({ message: "Server error", error: err.message });
   }
 };
 
@@ -112,17 +138,19 @@ export const updateCourse = async (req, res) => {
 export const deleteCourse = async (req, res) => {
   try {
     const { code } = req.params;
-    
+
     const course = await Course.findOneAndDelete({ code });
     if (!course) {
       return res.status(404).json({ message: "Course not found" });
     }
-    
-    return res.status(200).json({ message: "Course deleted successfully", course });
+
+    return res
+      .status(200)
+      .json({ message: "Course deleted successfully", course });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Server error", error: err.message });
+    return res
+      .status(500)
+      .json({ message: "Server error", error: err.message });
   }
 };
-
-export default router;

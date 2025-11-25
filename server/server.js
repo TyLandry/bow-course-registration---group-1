@@ -3,10 +3,10 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import authpaths from "./Routes/auth.js";
+import authpaths from "./routes/authRoutes.js";
 import programpaths from "./routes/programRoutes.js";
 import coursepaths from "./routes/courseRoutes.js";
-import studentpaths from "./Routes/studentRoutes.js";
+import studentpaths from "./routes/studentRoutes.js";
 import requireAuth from "./middleware/requiredAuth.js";
 import User from "./models/user.js";
 
