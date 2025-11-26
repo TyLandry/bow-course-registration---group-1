@@ -58,7 +58,7 @@ export async function register(req, res) {
     return res.status(400).json({ errors: errors.array() });
 
   let {
-    id,
+    // id,
     firstName,
     lastName,
     email,
@@ -79,7 +79,7 @@ export async function register(req, res) {
     const hashed = await bcrypt.hash(password, 10);
 
     const user = await User.create({
-      id,
+      // id,
       firstName,
       lastName,
       email,

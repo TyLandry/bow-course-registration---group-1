@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 
-const API_URL = 'http://localhost:5050/api';
+const API_URL = '/api';
 
 function CourseRegistration() {
   const [selectedTerm, setSelectedTerm] = useState('Fall');

@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 // import SignUpPage from "../../src/pages/SignupPage.jsx";
 
 const userSchema = new mongoose.Schema({
-  id: {
-    type: String,
-    required: true,
-  },
+  // id: {
+  //   type: String,
+  //   required: true,
+  // },
   firstName: {
     type: String,
     required: true,

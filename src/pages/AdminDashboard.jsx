@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/authentication";
 
-const API_URL = 'http://localhost:5050/api';
+const API_URL = '/api';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();

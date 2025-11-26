@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 
 const courseSchema = new mongoose.Schema({
+    _id: {
+    type: String,        //Making sure that _id = course code
+  },
   name: {
     type: String,
     required: true,
@@ -52,3 +55,5 @@ const courseSchema = new mongoose.Schema({
 const Course = mongoose.model("Course", courseSchema);
 
 export default Course;
+
+
