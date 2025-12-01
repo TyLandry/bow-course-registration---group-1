@@ -13,14 +13,13 @@ function ProfilePage() {
     program: "",
   });
 
-  
   const formatDateForDisplay = (dateString) => {
     if (!dateString) return "—";
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -28,7 +27,7 @@ function ProfilePage() {
   const formatDateForInput = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
+    return date.toISOString().split("T")[0];
   };
 
   useEffect(() => {
@@ -53,31 +52,30 @@ function ProfilePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       setIsUpdating(true);
-      console.log('Updating profile via API...');
+      console.log("Updating profile via API...");
 
-      // Only send student-relevant fields
       const profileData = {
         email: formData.email.trim(),
         phone: formData.phone,
         birthday: formData.birthday,
-        program: formData.program
+        program: formData.program,
       };
 
-      const response = await fetch('/api/student/profile', {
-        method: 'PUT',
-        credentials: 'include',
+      const response = await fetch("/api/auth/profile", {
+        method: "PUT",
+        credentials: "include",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(profileData)
+        body: JSON.stringify(profileData),
       });
 
       if (response.ok) {
         const result = await response.json();
-        console.log('Profile updated successfully:', result);
+        console.log("Profile updated successfully:", result);
 
         // Update current user context with new data
         const updatedUser = {
@@ -85,25 +83,21 @@ function ProfilePage() {
           email: profileData.email,
           phone: profileData.phone,
           birthday: profileData.birthday,
-          program: profileData.program
+          program: profileData.program,
         };
-        
+
         setCurrentUser(updatedUser);
         setShowModal(false);
-        
+
       } else {
         const errorData = await response.json();
-        console.error('Failed to update profile:', errorData.message);
-
+        console.error("Failed to update profile:", errorData.message);
       }
     } catch (error) {
-      console.error('Error updating profile:', error);
-
+      console.error("Error updating profile:", error);
     } finally {
       setIsUpdating(false);
     }
-
-
   };
 
   return (
@@ -241,7 +235,7 @@ function ProfilePage() {
                     disabled={isUpdating}
                     className="btn-primary-fill py-2 px-4 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {isUpdating ? 'Updating...' : 'Submit'}
+                    {isUpdating ? "Updating..." : "Submit"}
                   </button>
                 </div>
               </form>

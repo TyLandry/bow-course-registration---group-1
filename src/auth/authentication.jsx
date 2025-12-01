@@ -104,8 +104,10 @@ export function AuthProvider({ children }) {
     program,
     department,
     country,
+    role,
   }) => {
     const payload = {
+      id: crypto.randomUUID(),
       email: normalizeEmail(email),
       password,
       firstName,
@@ -115,6 +117,7 @@ export function AuthProvider({ children }) {
       program,
       department,
       country,
+      role,
     };
 
     const res = await fetch("/api/auth/register", {
@@ -132,7 +135,6 @@ export function AuthProvider({ children }) {
     // Automatically sign the new user in with the returned profile
     setCurrentUser(data);
 
-    const role = data.role ?? "student";
     nav(role === "student" ? "/student-dashboard" : "/admin-dashboard", {
       replace: true,
     });

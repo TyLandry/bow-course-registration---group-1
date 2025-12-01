@@ -1,7 +1,4 @@
-import express from "express";
 import Program from "../models/program.js";
-
-const router = express.Router();
 
 // Get all programs
 export const getPrograms = async (req, res) => {
@@ -13,5 +10,3 @@ export const getPrograms = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
-
-export default router;

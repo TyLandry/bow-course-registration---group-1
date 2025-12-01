@@ -1,34 +1,38 @@
 import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema({
+  _id: {
+    type: String,
+    unique: true,
+  },
   studentId: {
     type: String,
-    required: true
+    required: true,
   },
   fullName: {
     type: String,
-    required: true
+    required: true,
   },
   email: {
     type: String,
-    required: true
+    required: true,
   },
   phone: {
     type: String,
-    required: true
+    required: true,
   },
   subject: {
     type: String,
-    required: true
+    required: true,
   },
   message: {
     type: String,
-    required: true
+    required: true,
   },
   status: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const Message = mongoose.model("Message", messageSchema);

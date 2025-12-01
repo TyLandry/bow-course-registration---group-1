@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 
-const API_URL = 'http://localhost:5050/api';
+const API_URL = '/api';
 
 export default function CourseDetails() {
   const { courseCode } = useParams();
