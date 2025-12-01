@@ -218,7 +218,7 @@ export default function CourseManagement() {
           window.dispatchEvent(new CustomEvent("courseRefresh"));
 
         } else {
-          const error = await response.json();
+          await response.json();
 
         }
       } catch (error) {
@@ -295,7 +295,7 @@ export default function CourseManagement() {
         setShowModal(false);
         
       } else {
-        const error = await response.json();
+        await response.json();
         
       }
     } catch (error) {
