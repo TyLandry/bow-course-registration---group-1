@@ -39,7 +39,7 @@ function ContactPage() {
       if (response.ok) {
         const result = await response.json();
         console.log('Message submitted successfully:', result);
-        alert('Message sent successfully!');
+
         setFormData({
           fullName: '',
           email: '',
@@ -49,11 +49,11 @@ function ContactPage() {
         });
       } else {
         console.error('Failed to submit message:', response.status);
-        alert('Failed to send message. Please try again.');
+
       }
     } catch (error) {
       console.error('Error submitting message:', error);
-      alert('Failed to send message. Please try again.');
+
     } finally {
       setIsSubmitting(false);
     }

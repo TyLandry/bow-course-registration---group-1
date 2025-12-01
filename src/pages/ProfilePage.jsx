@@ -91,16 +91,14 @@ function ProfilePage() {
         setCurrentUser(updatedUser);
         setShowModal(false);
         
-        // Optional: Show success message
-        alert('Profile updated successfully!');
       } else {
         const errorData = await response.json();
         console.error('Failed to update profile:', errorData.message);
-        alert(errorData.message || 'Failed to update profile');
+
       }
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert('Failed to update profile. Please try again.');
+
     } finally {
       setIsUpdating(false);
     }

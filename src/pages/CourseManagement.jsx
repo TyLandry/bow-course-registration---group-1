@@ -204,14 +204,13 @@ export default function CourseManagement() {
           // Trigger refresh on admin dashboard
           window.dispatchEvent(new CustomEvent('courseRefresh'));
           
-          alert('Course deleted successfully');
         } else {
           const error = await response.json();
-          alert(`Failed to delete course: ${error.message}`);
+
         }
       } catch (error) {
         console.error('Error deleting course:', error);
-        alert('Error deleting course. Please try again.');
+
       }
     }
   };
@@ -273,14 +272,13 @@ export default function CourseManagement() {
         window.dispatchEvent(new CustomEvent('courseRefresh'));
         
         setShowModal(false);
-        alert(`Course ${editingCourse ? 'updated' : 'added'} successfully!`);
+
       } else {
         const error = await response.json();
-        alert(`Failed to ${editingCourse ? 'update' : 'add'} course: ${error.message}`);
+
       }
     } catch (error) {
       console.error('Error submitting course:', error);
-      alert('Error saving course. Please try again.');
     }
   };
 

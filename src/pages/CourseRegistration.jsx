@@ -159,7 +159,7 @@ function CourseRegistration() {
   const addCourse = async (course) => {
     // check if course is already registered
     if (registeredCourses.find((regCourse) => regCourse.code === course.code)) {
-      alert('Course is already registered');
+      
       return;
     }
 
@@ -207,16 +207,15 @@ function CourseRegistration() {
         // setRegisteredCourses(updatedRegisteredCourses);
 
         // this is a simple alert, can be replaced with a better notification system
-        alert(`Successfully registered for ${course.name}!`);
 
       } else {
         const error = await response.json();
         console.error('Registration failed:', error);
-        alert(`Registration failed: ${error.message || 'Unknown error'}`);
+        
       }
     } catch (error) {
       console.error('Error registering for course:', error);
-      alert('Registration failed due to network error. Please try again.');
+      
     }
   };
 

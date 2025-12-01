@@ -89,15 +89,15 @@ export default function CourseDetails() {
         });
 
         if (response.ok) {
-          alert('Course removed successfully!');
+
           // Navigate back to student dashboard
           navigate('/student-dashboard');
         } else {
-          alert('Failed to remove course. Please try again.');
+
         }
       } catch (error) {
         console.error('Error removing course:', error);
-        alert('Error removing course. Please try again.');
+
       }
     }
   };
