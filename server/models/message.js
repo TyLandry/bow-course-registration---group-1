@@ -1,10 +1,6 @@
 import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema({
-  _id: {
-    type: String,
-    unique: true,
-  },
   studentId: {
     type: String,
     required: true,
