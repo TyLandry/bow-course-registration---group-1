@@ -16,18 +16,20 @@ function ProfilePage() {
   const formatDateForDisplay = (dateString) => {
     if (!dateString) return "—";
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+    const year = date.getUTCFullYear();
+    const month = date.toLocaleDateString("en-US", { month: "long", timeZone: "UTC" });
+    const day = date.getUTCDate();
+    return `${month} ${day}, ${year}`;
   };
 
   // Helper function to format date for input (YYYY-MM-DD)
   const formatDateForInput = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toISOString().split("T")[0];
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(date.getUTCDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
   };
 
   useEffect(() => {
